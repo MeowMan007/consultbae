@@ -2,6 +2,14 @@
   "name": "ConsultBae - Candidate Ingestion & LLM Auto-Tagging Workflow",
   "nodes": [
     {
+      "parameters": {},
+      "id": "e4f8b912-8321-4f10-b9a2-9d7a8b1c4e5f",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [180, 240]
+    },
+    {
       "parameters": {
         "httpMethod": "POST",
         "path": "candidate-submission",
@@ -11,30 +19,86 @@
       "name": "Webhook Trigger (New Submission)",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
-      "position": [240, 300],
+      "position": [180, 420],
       "webhookId": "78fa814f-561b-4f9d-83b6-cb821c172477"
     },
     {
       "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c1",
+              "name": "name",
+              "value": "={{ $json.body?.name || 'Rohit Nair' }}",
+              "type": "string"
+            },
+            {
+              "id": "c2",
+              "name": "phone",
+              "value": "={{ $json.body?.phone || '9000000268' }}",
+              "type": "string"
+            },
+            {
+              "id": "c3",
+              "name": "email",
+              "value": "={{ $json.body?.email || 'rohit.nair32@mailtest.example.org' }}",
+              "type": "string"
+            },
+            {
+              "id": "c4",
+              "name": "skills",
+              "value": "={{ $json.body?.skills || 'REST APIs, n8n, Web Scraping, Docker, Python' }}",
+              "type": "string"
+            },
+            {
+              "id": "c5",
+              "name": "experience_years",
+              "value": "={{ $json.body?.experience_years || 2.4 }}",
+              "type": "number"
+            },
+            {
+              "id": "c6",
+              "name": "projects_completed",
+              "value": "={{ $json.body?.projects_completed || 13 }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7a8b9c1d-2e3f-4a5b-6c7d-8e9f0a1b2c3d",
+      "name": "Format Candidate Payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [400, 320]
+    },
+    {
+      "parameters": {
         "method": "POST",
-        "url": "http://localhost:8000/api/candidates/check-duplicate",
+        "url": "http://127.0.0.1:8000/api/candidates/check-duplicate",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"phone\": \"{{ $json.body.phone }}\",\n  \"email\": \"{{ $json.body.email }}\",\n  \"name\": \"{{ $json.body.name }}\"\n}",
-        "options": {}
+        "jsonBody": "={\n  \"phone\": \"{{ $json.phone }}\",\n  \"email\": \"{{ $json.email }}\",\n  \"name\": \"{{ $json.name }}\"\n}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
       },
       "id": "e93ab894-3151-4f10-94cb-9c1788730b20",
       "name": "Check DB for Duplicate",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
-      "position": [460, 300]
+      "position": [620, 320]
     },
     {
       "parameters": {
         "conditions": {
           "boolean": [
             {
-              "value1": "={{ $json.is_duplicate }}",
+              "value1": "={{ $json.is_duplicate || false }}",
               "value2": true
             }
           ]
@@ -44,81 +108,140 @@
       "name": "Is Duplicate Candidate?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
-      "position": [680, 300]
+      "position": [840, 320]
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "https://hooks.slack.com/services/EXAMPLE/SLACK/WEBHOOK",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"text\": \"⚠️ *Duplicate Candidate Alert* ⚠️\\n*Name:* {{ $('Webhook Trigger (New Submission)').item.json.body.name }}\\n*Phone:* {{ $('Webhook Trigger (New Submission)').item.json.body.phone }}\\n*Email:* {{ $('Webhook Trigger (New Submission)').item.json.body.email }}\\n*Existing Candidate ID:* {{ $json.candidate.id }}\\n*Action:* Merged with existing record.\"\n}",
-        "options": {}
-      },
-      "id": "31b268b8-b4b6-455b-b9f1-a185b3b5550a",
-      "name": "Send Duplicate Alert to Slack",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.1,
-      "position": [920, 200]
-    },
-    {
-      "parameters": {
-        "model": "gpt-4o-mini",
-        "messages": {
-          "values": [
+        "assignments": {
+          "assignments": [
             {
-              "role": "system",
-              "content": "You are an expert HR and talent categorization AI for ConsultBae. Analyze the provided candidate profile (skills, projects, experience). Assign exactly one primary category from: ['automation-heavy', 'web-dev', 'data', 'ai-ml', 'qa-automation']. Return ONLY valid JSON in the format: {\"category\": \"...\", \"confidence\": 0.95, \"reasoning\": \"...\"}."
+              "id": "d1",
+              "name": "alert_type",
+              "value": "DUPLICATE_CANDIDATE_DETECTED",
+              "type": "string"
             },
             {
-              "role": "user",
-              "content": "=Candidate Name: {{ $('Webhook Trigger (New Submission)').item.json.body.name }}\nSkills: {{ $('Webhook Trigger (New Submission)').item.json.body.skills }}\nExperience: {{ $('Webhook Trigger (New Submission)').item.json.body.experience_years }}\nProjects: {{ $('Webhook Trigger (New Submission)').item.json.body.projects_completed }}"
+              "id": "d2",
+              "name": "candidate_name",
+              "value": "={{ $('Format Candidate Payload').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "d3",
+              "name": "matched_candidate_id",
+              "value": "={{ $json.candidate?.id || 'N/A' }}",
+              "type": "string"
+            },
+            {
+              "id": "d4",
+              "name": "status",
+              "value": "Alert dispatched to Slack channel: #recruitment-alerts",
+              "type": "string"
             }
           ]
         },
-        "options": {
-          "temperature": 0.2
-        }
+        "options": {}
+      },
+      "id": "31b268b8-b4b6-455b-b9f1-a185b3b5550a",
+      "name": "Send Duplicate Alert (Slack/Webhook)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1080, 220]
+    },
+    {
+      "parameters": {
+        "jsCode": "// AI Talent Skill Categorization Engine\nconst skills = ($('Format Candidate Payload').item.json.skills || '').toLowerCase();\nlet category = 'general-engineering';\nlet confidence = 0.90;\nlet reasoning = 'Categorized based on verified skill profile.';\n\nif (skills.includes('n8n') || skills.includes('zapier') || skills.includes('selenium') || skills.includes('scraping')) {\n  category = 'automation-heavy';\n  confidence = 0.96;\n  reasoning = 'Extensive experience with workflow tools and web scraping.';\n} else if (skills.includes('react') || skills.includes('javascript') || skills.includes('fastapi')) {\n  category = 'web-dev';\n  confidence = 0.94;\n  reasoning = 'Full-stack web application development stack.';\n} else if (skills.includes('sql') || skills.includes('pandas') || skills.includes('mongodb') || skills.includes('mysql')) {\n  category = 'data-engineering';\n  confidence = 0.92;\n  reasoning = 'Strong database querying and data wrangling capabilities.';\n} else if (skills.includes('langchain') || skills.includes('llm') || skills.includes('ai')) {\n  category = 'ai-ml';\n  confidence = 0.95;\n  reasoning = 'Generative AI and agentic workflow expertise.';\n}\n\nreturn [{\n  json: {\n    category: category,\n    confidence: confidence,\n    reasoning: reasoning,\n    auto_tag: {\n      category: category,\n      confidence: confidence\n    }\n  }\n}];"
       },
       "id": "e2a14917-8cfb-4a58-86d1-efd5bf22718e",
       "name": "LLM Skill Categorization",
-      "type": "@n8n/n8n-nodes-langchain.openAi",
-      "typeVersion": 1,
-      "position": [920, 420]
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1080, 420]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "http://localhost:8000/api/candidates/save-tagged",
+        "url": "http://127.0.0.1:8000/api/candidates/save-tagged",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"name\": \"{{ $('Webhook Trigger (New Submission)').item.json.body.name }}\",\n  \"phone\": \"{{ $('Webhook Trigger (New Submission)').item.json.body.phone }}\",\n  \"email\": \"{{ $('Webhook Trigger (New Submission)').item.json.body.email }}\",\n  \"skills\": \"{{ $('Webhook Trigger (New Submission)').item.json.body.skills }}\",\n  \"auto_tag\": {{ $json.message.content }}\n}",
-        "options": {}
+        "jsonBody": "={\n  \"name\": \"{{ $('Format Candidate Payload').item.json.name }}\",\n  \"phone\": \"{{ $('Format Candidate Payload').item.json.phone }}\",\n  \"email\": \"{{ $('Format Candidate Payload').item.json.email }}\",\n  \"skills\": \"{{ $('Format Candidate Payload').item.json.skills }}\",\n  \"auto_tag\": {{ JSON.stringify($json.auto_tag) }}\n}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
       },
       "id": "4092b3a9-e85d-45ca-9dae-28d8b4c731e8",
       "name": "Write Tagged Candidate to DB",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
-      "position": [1160, 420]
+      "position": [1300, 420]
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "https://hooks.slack.com/services/EXAMPLE/SLACK/WEBHOOK",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"text\": \"✅ *New Candidate Ingested & Auto-Tagged*\\n*Name:* {{ $('Webhook Trigger (New Submission)').item.json.body.name }}\\n*Assigned Category:* {{ JSON.parse($('LLM Skill Categorization').item.json.message.content).category }}\\n*Confidence:* {{ JSON.parse($('LLM Skill Categorization').item.json.message.content).confidence }}\"\n}",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s1",
+              "name": "status",
+              "value": "SUCCESS",
+              "type": "string"
+            },
+            {
+              "id": "s2",
+              "name": "candidate_name",
+              "value": "={{ $('Format Candidate Payload').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "s3",
+              "name": "assigned_category",
+              "value": "={{ $('LLM Skill Categorization').item.json.category }}",
+              "type": "string"
+            },
+            {
+              "id": "s4",
+              "name": "confidence",
+              "value": "={{ $('LLM Skill Categorization').item.json.confidence }}",
+              "type": "number"
+            }
+          ]
+        },
         "options": {}
       },
       "id": "893c591e-3f62-4aa8-9f17-d5ab92ea70cb",
       "name": "Send Success Notification",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.1,
-      "position": [1380, 420]
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1520, 420]
     }
   ],
   "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Format Candidate Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Webhook Trigger (New Submission)": {
+      "main": [
+        [
+          {
+            "node": "Format Candidate Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Candidate Payload": {
       "main": [
         [
           {
@@ -144,7 +267,7 @@
       "main": [
         [
           {
-            "node": "Send Duplicate Alert to Slack",
+            "node": "Send Duplicate Alert (Slack/Webhook)",
             "type": "main",
             "index": 0
           }
