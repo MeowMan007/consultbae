@@ -151,22 +151,23 @@ A full-stack, responsive web application allowing gig workers to submit voice re
 
 ## 📊 Task 4: Data Quality & Issues Report
 
-During ETL development, we detected **12 planted data traps** across the 3 raw files. Below is the complete catalog of defects, root causes, and programmatic remedies:
+During ETL development, we detected **13 planted data traps** across the 3 raw files. Below is the complete catalog of defects, root causes, and programmatic remedies:
 
 | # | Anomaly Category | Planted Trap Example in Dataset | Remediation Strategy |
 |---|---|---|---|
 | **1** | **Shifted Columns / Malformed CSV Row** | System 3, Row 19: `"react, javascript, mysql", ISHA.CHOPRA95@MAILTEST.EXAMPLE.ORG, Isha Chopra, 1406/hr, Pune, active` (Skills in `email_id` column, email in `worker_name`, etc.) | Developed an anomaly detector in `normalizers.py` that verifies email regex on column 1. If invalid but column 2 matches email pattern, it shifts slice indices back to standard schema before DB insertion. |
 | **2** | **Completely Blank Rows** | System 3, Row 11: `,,,,,` | Filter drops any row where all values are empty or whitespace prior to parsing. |
-| **3** | **Inconsistent Phone Formats** | `+91-9000000131`, `919000000231`, `09000000287`, `9000000113` | Stripped all non-digit characters, leading `+91`, `91`, and `0` to produce canonical 10-digit Indian numbers (`9000000xxx`). |
-| **4** | **Email Casing & Whitespace** | `ISHA.CHOPRA95@MAILTEST.EXAMPLE.ORG`, `DEEPAK.NAIR44@EXAMPLE.COM` | Normalized via `.strip().lower()` with RFC regex validation. |
-| **5** | **Compensation Units Inconsistency** | System 2 & 3: LPA floats (`4.2`, `8.3`), raw annual INR (`417964`), hourly (`1415/hr`), monthly (`15k/month`) | Parser heuristic: Values $<100$ in CTC are multiplied by 100,000 (Lakhs to INR). `15k/month` is annualized ($15000 \times 12$). Hourly rates stored separately. |
-| **6** | **Common Name Disambiguation** | System 1: `Arjun Mehta` @ `9000000131` vs `Arjun Mehta` @ `9000000272`. System 3: `Deepak Nair` @ `deepak.nair44...` vs `Deepak Nair` @ `deepak.nair57...` | Strict zero-false-positive rule: identical names with different verified phone numbers/emails are never merged. |
-| **7** | **Abbreviated / Nickname Aliases** | System 2: `R. Verma` vs `Rohit Verma` (same phone `9000000294` and email `rohit.verma13@...`) | Merged on verified Phone/Email keys; name canonicalized to the more descriptive, non-abbreviated version (`Rohit Verma`). |
-| **8** | **Alias / Secondary Emails** | System 2: `Nikhil Chopra` (`09000000103`) with `nikhil.chopra70@example.com` and `alt.nikhil.chopra70@example.com` | Merged into single candidate record via phone anchor; secondary email recorded in `candidate_emails` multi-value table. |
-| **9** | **Multi-Format Applied Dates** | `24-07-2026`, `2026-08-08`, `7 Jul 2026`, `07/13/2026`, `08/19/2026` | Multi-pattern datetime parser standardizes all timestamps into ISO 8601 strings (`YYYY-MM-DD`). |
-| **10** | **City Name Synonyms & Whitespace** | `gurugram `, `GURGAON`, `Noida `, `new delhi`, `Delhi NCR`, `bangalore` vs `Bengaluru` | Normalized through canonical dictionary mapping: `{'gurgaon': 'Gurugram', 'bangalore': 'Bengaluru', 'delhi ncr': 'New Delhi', ...}`. |
-| **11** | **Boolean & Status Inconsistencies** | `Y`, `yes`, `Yes`, `No`, `N`, `active`, `ACTIVE`, `paused`, `Inactive` | Standardized `is_verified` to boolean (`True`/`False`) and status to enum (`ACTIVE`, `INACTIVE`, `PAUSED`). |
-| **12** | **Skill String Delimiter & Case Variations** | `"n8n, LangChain, REST APIs"`, `"sql, mongodb, selenium"` | Split by commas, trimmed, converted to canonical title representation, and stored in a junction table. |
+| **3** | **Duplicate Header Row Embedded Mid-File** | System 1, Row 15: `Name,Phone Number,City,Verified,Projects Completed` (header row repeated inside data body) | Ingestion detects rows where the `Name` column value literally equals the header text `"Name"` and skips them as duplicate headers. |
+| **4** | **Inconsistent Phone Formats** | `+91-9000000131`, `919000000231`, `09000000287`, `9000000113` | Stripped all non-digit characters, leading `+91`, `91`, and `0` to produce canonical 10-digit Indian numbers (`9000000xxx`). |
+| **5** | **Email Casing & Whitespace** | `ISHA.CHOPRA95@MAILTEST.EXAMPLE.ORG`, `DEEPAK.NAIR44@EXAMPLE.COM` | Normalized via `.strip().lower()` with RFC regex validation. |
+| **6** | **Compensation Units Inconsistency** | System 2 & 3: LPA floats (`4.2`, `8.3`), raw annual INR (`417964`), hourly (`1415/hr`), monthly (`15k/month`) | Parser heuristic: Values $<100$ in CTC are multiplied by 100,000 (Lakhs to INR). `15k/month` is annualized ($15000 \times 12$). Hourly rates stored separately. |
+| **7** | **Common Name Disambiguation** | System 1: `Arjun Mehta` @ `9000000131` vs `Arjun Mehta` @ `9000000272`. System 3: `Deepak Nair` @ `deepak.nair44...` vs `Deepak Nair` @ `deepak.nair57...` | Strict zero-false-positive rule: identical names with different verified phone numbers/emails are never merged. |
+| **8** | **Abbreviated / Nickname Aliases** | System 2: `R. Verma` vs `Rohit Verma` (same phone `9000000294` and email `rohit.verma13@...`) | Merged on verified Phone/Email keys; name canonicalized to the more descriptive, non-abbreviated version (`Rohit Verma`). |
+| **9** | **Alias / Secondary Emails** | System 2: `Nikhil Chopra` (`09000000103`) with `nikhil.chopra70@example.com` and `alt.nikhil.chopra70@example.com` | Merged into single candidate record via phone anchor; secondary email recorded in `candidate_emails` multi-value table. |
+| **10** | **Multi-Format Applied Dates** | `24-07-2026`, `2026-08-08`, `7 Jul 2026`, `07/13/2026`, `08/19/2026` | Multi-pattern datetime parser standardizes all timestamps into ISO 8601 strings (`YYYY-MM-DD`). |
+| **11** | **City Name Synonyms & Whitespace** | `gurugram `, `GURGAON`, `Noida `, `new delhi`, `Delhi NCR`, `bangalore` vs `Bengaluru` | Normalized through canonical dictionary mapping: `{'gurgaon': 'Gurugram', 'bangalore': 'Bengaluru', 'delhi ncr': 'New Delhi', ...}`. |
+| **12** | **Boolean & Status Inconsistencies** | `Y`, `yes`, `Yes`, `No`, `N`, `active`, `ACTIVE`, `paused`, `Inactive` | Standardized `is_verified` to boolean (`True`/`False`) and status to enum (`ACTIVE`, `INACTIVE`, `PAUSED`). |
+| **13** | **Skill String Delimiter & Case Variations** | `"n8n, LangChain, REST APIs"`, `"sql, mongodb, selenium"` | Split by commas, trimmed, converted to canonical title representation, and stored in a junction table. |
 
 ---
 

@@ -31,6 +31,12 @@ def ingest_system1(file_path: str, matcher: EntityMatcher) -> Dict[str, int]:
     with open(file_path, mode="r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         for row in reader:
+            # Trap: Duplicate header row embedded mid-file (e.g. row 15 repeats "Name,Phone Number,...")
+            raw_name = row.get("Name", "")
+            if raw_name and raw_name.strip() == "Name":
+                stats["skipped"] += 1
+                continue
+
             stats["read"] += 1
             raw_name = row.get("Name")
             raw_phone = row.get("Phone Number")
@@ -205,7 +211,7 @@ def run_pipeline():
 
     print(f"[*] Ingesting System 1: {os.path.basename(file1)}...")
     s1_stats = ingest_system1(file1, matcher)
-    print(f"    -> Read: {s1_stats['read']} | Created: {s1_stats['created']} | Merged: {s1_stats['merged']}")
+    print(f"    -> Read: {s1_stats['read']} | Created: {s1_stats['created']} | Merged: {s1_stats['merged']} | Skipped Header Rows: {s1_stats['skipped']}")
 
     print(f"[*] Ingesting System 2: {os.path.basename(file2)}...")
     s2_stats = ingest_system2(file2, matcher)
