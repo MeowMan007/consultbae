@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConsultBae — Audio Collection & Automation Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="glow-bg glow-1"></div>
+    <div class="glow-bg glow-2"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="brand">
+                <div class="logo-icon">🎙️</div>
+                <div class="brand-text">
+                    <h1>ConsultBae Audio Studio</h1>
+                    <p>AI Worker Voice Collection & Acoustic Feature Extraction</p>
+                </div>
+            </div>
+            <div class="stats-badge-container">
+                <div class="stat-pill">
+                    <span class="pill-dot live"></span>
+                    <span class="pill-label">Unified Candidates:</span>
+                    <span class="pill-val" id="stat-candidates">--</span>
+                </div>
+                <div class="stat-pill">
+                    <span class="pill-dot blue"></span>
+                    <span class="pill-label">Audio Submissions:</span>
+                    <span class="pill-val" id="stat-audios">--</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <div class="tabs-nav">
+            <button class="tab-btn active" data-tab="tab-submit" id="btn-tab-submit">
+                <span class="tab-icon">⏺️</span> Worker Audio Submission
+            </button>
+            <button class="tab-btn" data-tab="tab-gallery" id="btn-tab-gallery">
+                <span class="tab-icon">📊</span> Submissions Gallery & Audio Player
+            </button>
+        </div>
+
+        <!-- TAB 1: SUBMISSION PORTAL -->
+        <section class="tab-content active" id="tab-submit">
+            <div class="grid-2-col">
+                <!-- Left: Form & Recorder -->
+                <div class="glass-card">
+                    <h2 class="card-title">📝 Worker Information</h2>
+                    <form id="audio-form" onsubmit="event.preventDefault();">
+                        <div class="form-group">
+                            <label for="worker-name">Full Name <span class="req">*</span></label>
+                            <input type="text" id="worker-name" placeholder="e.g. Arjun Mehta" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="worker-phone">Phone Number (10 Digits) <span class="req">*</span></label>
+                            <input type="tel" id="worker-phone" placeholder="e.g. +91 9000000131 or 9000000131" required>
+                        </div>
+
+                        <!-- Audio Source Toggle -->
+                        <div class="source-toggle-group">
+                            <button type="button" class="source-toggle active" id="toggle-record">
+                                🎙️ Live Microphone
+                            </button>
+                            <button type="button" class="source-toggle" id="toggle-upload">
+                                📁 Upload Audio File
+                            </button>
+                        </div>
+
+                        <!-- Live Recorder Box -->
+                        <div class="recorder-section" id="recorder-box">
+                            <div class="visualizer-container">
+                                <canvas id="waveform-canvas"></canvas>
+                                <div class="rec-timer" id="rec-timer">00:00</div>
+                            </div>
+                            <div class="recorder-controls">
+                                <button type="button" class="btn btn-record" id="btn-start-record">
+                                    <span class="rec-dot"></span> Start Recording
+                                </button>
+                                <button type="button" class="btn btn-stop" id="btn-stop-record" disabled>
+                                    ⏹️ Stop
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- File Upload Box -->
+                        <div class="upload-section hidden" id="upload-box">
+                            <div class="drop-zone" id="drop-zone">
+                                <div class="drop-icon">📤</div>
+                                <p class="drop-text">Drag & drop audio file here or <span class="browse-link">Browse</span></p>
+                                <span class="drop-sub">Supported formats: WAV, MP3, WebM, OGG, M4A</span>
+                                <input type="file" id="file-input" accept="audio/*" class="file-hidden">
+                            </div>
+                        </div>
+
+                        <!-- Preview Player -->
+                        <div class="preview-container hidden" id="preview-box">
+                            <div class="preview-header">
+                                <span>🎵 Audio Preview Ready</span>
+                                <button type="button" class="btn-clear" id="btn-clear-audio">✕ Clear</button>
+                            </div>
+                            <audio id="preview-player" controls class="audio-player-custom"></audio>
+                        </div>
+
+                        <button type="button" class="btn btn-primary submit-btn" id="btn-submit" disabled>
+                            🚀 Submit Audio Recording
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Right: Live Acoustic Analysis Result Card -->
+                <div class="glass-card" id="result-card">
+                    <h2 class="card-title">⚡ Acoustic Feature Extraction</h2>
+                    <p class="card-subtitle">Real-time signal analysis computed automatically upon submission:</p>
+
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-icon">⏱️</div>
+                            <div class="metric-info">
+                                <span class="metric-label">Duration</span>
+                                <span class="metric-value" id="res-duration">-- s</span>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon">📻</div>
+                            <div class="metric-info">
+                                <span class="metric-label">Sample Rate</span>
+                                <span class="metric-value" id="res-samplerate">-- kHz</span>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon">📈</div>
+                            <div class="metric-info">
+                                <span class="metric-label">Bitrate</span>
+                                <span class="metric-value" id="res-bitrate">-- kbps</span>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon">🔊</div>
+                            <div class="metric-info">
+                                <span class="metric-label">Loudness (dBFS)</span>
+                                <span class="metric-value" id="res-loudness">-- dBFS</span>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon">🛡️</div>
+                            <div class="metric-info">
+                                <span class="metric-label">SNR (Noise Floor)</span>
+                                <span class="metric-value" id="res-snr">-- dB</span>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon">⭐</div>
+                            <div class="metric-info">
+                                <span class="metric-label">Quality Score</span>
+                                <span class="metric-value grade" id="res-quality">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="status-banner info" id="status-banner">
+                        Ready for candidate submission. Record or upload an audio file to extract acoustic properties.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: AUDITOR GALLERY -->
+        <section class="tab-content" id="tab-gallery">
+            <div class="glass-card">
+                <div class="gallery-header">
+                    <div>
+                        <h2 class="card-title">🎧 Audio Submissions & Quality Review Gallery</h2>
+                        <p class="card-subtitle">All worker recordings stored in SQLite database with extracted properties</p>
+                    </div>
+                    <div class="gallery-actions">
+                        <input type="text" id="search-submissions" placeholder="🔍 Search name or phone..." class="search-input">
+                        <button class="btn btn-secondary" id="btn-refresh-gallery">🔄 Refresh</button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Worker Name</th>
+                                <th>Phone</th>
+                                <th>Audio Player</th>
+                                <th>Duration</th>
+                                <th>Sample Rate</th>
+                                <th>Bitrate</th>
+                                <th>Loudness (dBFS)</th>
+                                <th>SNR</th>
+                                <th>Quality</th>
+                                <th>Submitted At</th>
+                            </tr>
+                        </thead>
+                        <tbody id="submissions-tbody">
+                            <tr>
+                                <td colspan="10" class="text-center">Loading recordings...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
