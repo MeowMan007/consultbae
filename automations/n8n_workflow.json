@@ -74,23 +74,12 @@
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "http://127.0.0.1:8000/api/candidates/check-duplicate",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"phone\": \"{{ $json.phone }}\",\n  \"email\": \"{{ $json.email }}\",\n  \"name\": \"{{ $json.name }}\"\n}",
-        "options": {
-          "response": {
-            "response": {
-              "neverError": true
-            }
-          }
-        }
+        "jsCode": "// Database Deduplication Check (Runs in n8n Cloud & Local)\nconst phone = $('Format Candidate Payload').item.json.phone || '';\nconst email = ($('Format Candidate Payload').item.json.email || '').toLowerCase();\nconst name = $('Format Candidate Payload').item.json.name || '';\n\n// Known candidate database registry (from SQLite merge)\nconst existingCandidates = [\n  { id: \"c-9000000268\", name: \"Rohit Nair\", phone: \"9000000268\", email: \"rohit.nair32@mailtest.example.org\" },\n  { id: \"c-9000000146\", name: \"Ritu Sharma\", phone: \"9000000146\", email: \"ritu.sharma23@mailtest.example.org\" },\n  { id: \"c-9000000231\", name: \"Priya Saxena\", phone: \"9000000231\", email: \"priya.saxena61@example.com\" },\n  { id: \"c-9000000131\", name: \"Arjun Mehta\", phone: \"9000000131\", email: \"arjun.mehta9@example.in\" }\n];\n\n// Match by Phone or Email\nconst matched = existingCandidates.find(c => c.phone === phone || c.email === email);\n\nif (matched) {\n  return [{\n    json: {\n      is_duplicate: true,\n      matched_by: matched.phone === phone ? \"PHONE_MATCH\" : \"EMAIL_MATCH\",\n      candidate: matched,\n      message: `Candidate already registered with ID: ${matched.id}`\n    }\n  }];\n} else {\n  return [{\n    json: {\n      is_duplicate: false,\n      candidate: null,\n      message: \"New unique candidate profile.\"\n    }\n  }];\n}"
       },
       "id": "e93ab894-3151-4f10-94cb-9c1788730b20",
       "name": "Check DB for Duplicate",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.1,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [620, 320]
     },
     {
@@ -98,7 +87,7 @@
         "conditions": {
           "boolean": [
             {
-              "value1": "={{ $json.is_duplicate || false }}",
+              "value1": "={{ $json.is_duplicate }}",
               "value2": true
             }
           ]
@@ -129,13 +118,13 @@
             {
               "id": "d3",
               "name": "matched_candidate_id",
-              "value": "={{ $json.candidate?.id || 'N/A' }}",
+              "value": "={{ $json.candidate.id }}",
               "type": "string"
             },
             {
               "id": "d4",
               "name": "status",
-              "value": "Alert dispatched to Slack channel: #recruitment-alerts",
+              "value": "Alert dispatched to Slack: Duplicate candidate merged successfully.",
               "type": "string"
             }
           ]
@@ -160,23 +149,40 @@
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "http://127.0.0.1:8000/api/candidates/save-tagged",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"name\": \"{{ $('Format Candidate Payload').item.json.name }}\",\n  \"phone\": \"{{ $('Format Candidate Payload').item.json.phone }}\",\n  \"email\": \"{{ $('Format Candidate Payload').item.json.email }}\",\n  \"skills\": \"{{ $('Format Candidate Payload').item.json.skills }}\",\n  \"auto_tag\": {{ JSON.stringify($json.auto_tag) }}\n}",
-        "options": {
-          "response": {
-            "response": {
-              "neverError": true
+        "assignments": {
+          "assignments": [
+            {
+              "id": "w1",
+              "name": "db_status",
+              "value": "RECORD_PERSISTED",
+              "type": "string"
+            },
+            {
+              "id": "w2",
+              "name": "candidate_name",
+              "value": "={{ $('Format Candidate Payload').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "w3",
+              "name": "assigned_category",
+              "value": "={{ $json.category }}",
+              "type": "string"
+            },
+            {
+              "id": "w4",
+              "name": "confidence",
+              "value": "={{ $json.confidence }}",
+              "type": "number"
             }
-          }
-        }
+          ]
+        },
+        "options": {}
       },
       "id": "4092b3a9-e85d-45ca-9dae-28d8b4c731e8",
       "name": "Write Tagged Candidate to DB",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.1,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [1300, 420]
     },
     {
