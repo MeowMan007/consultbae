@@ -1,0 +1,187 @@
+{
+  "name": "ConsultBae - Candidate Ingestion & LLM Auto-Tagging Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "candidate-submission",
+        "options": {}
+      },
+      "id": "1c7f4281-a67b-4899-bfa2-32a870d06ec4",
+      "name": "Webhook Trigger (New Submission)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "78fa814f-561b-4f9d-83b6-cb821c172477"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:8000/api/candidates/check-duplicate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"phone\": \"{{ $json.body.phone }}\",\n  \"email\": \"{{ $json.body.email }}\",\n  \"name\": \"{{ $json.body.name }}\"\n}",
+        "options": {}
+      },
+      "id": "e93ab894-3151-4f10-94cb-9c1788730b20",
+      "name": "Check DB for Duplicate",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.is_duplicate }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "d094b8e2-bdf4-4638-89c2-555e7fa92be1",
+      "name": "Is Duplicate Candidate?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://hooks.slack.com/services/EXAMPLE/SLACK/WEBHOOK",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"⚠️ *Duplicate Candidate Alert* ⚠️\\n*Name:* {{ $('Webhook Trigger (New Submission)').item.json.body.name }}\\n*Phone:* {{ $('Webhook Trigger (New Submission)').item.json.body.phone }}\\n*Email:* {{ $('Webhook Trigger (New Submission)').item.json.body.email }}\\n*Existing Candidate ID:* {{ $json.candidate.id }}\\n*Action:* Merged with existing record.\"\n}",
+        "options": {}
+      },
+      "id": "31b268b8-b4b6-455b-b9f1-a185b3b5550a",
+      "name": "Send Duplicate Alert to Slack",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [920, 200]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are an expert HR and talent categorization AI for ConsultBae. Analyze the provided candidate profile (skills, projects, experience). Assign exactly one primary category from: ['automation-heavy', 'web-dev', 'data', 'ai-ml', 'qa-automation']. Return ONLY valid JSON in the format: {\"category\": \"...\", \"confidence\": 0.95, \"reasoning\": \"...\"}."
+            },
+            {
+              "role": "user",
+              "content": "=Candidate Name: {{ $('Webhook Trigger (New Submission)').item.json.body.name }}\nSkills: {{ $('Webhook Trigger (New Submission)').item.json.body.skills }}\nExperience: {{ $('Webhook Trigger (New Submission)').item.json.body.experience_years }}\nProjects: {{ $('Webhook Trigger (New Submission)').item.json.body.projects_completed }}"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "e2a14917-8cfb-4a58-86d1-efd5bf22718e",
+      "name": "LLM Skill Categorization",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [920, 420]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:8000/api/candidates/save-tagged",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"name\": \"{{ $('Webhook Trigger (New Submission)').item.json.body.name }}\",\n  \"phone\": \"{{ $('Webhook Trigger (New Submission)').item.json.body.phone }}\",\n  \"email\": \"{{ $('Webhook Trigger (New Submission)').item.json.body.email }}\",\n  \"skills\": \"{{ $('Webhook Trigger (New Submission)').item.json.body.skills }}\",\n  \"auto_tag\": {{ $json.message.content }}\n}",
+        "options": {}
+      },
+      "id": "4092b3a9-e85d-45ca-9dae-28d8b4c731e8",
+      "name": "Write Tagged Candidate to DB",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1160, 420]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://hooks.slack.com/services/EXAMPLE/SLACK/WEBHOOK",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"✅ *New Candidate Ingested & Auto-Tagged*\\n*Name:* {{ $('Webhook Trigger (New Submission)').item.json.body.name }}\\n*Assigned Category:* {{ JSON.parse($('LLM Skill Categorization').item.json.message.content).category }}\\n*Confidence:* {{ JSON.parse($('LLM Skill Categorization').item.json.message.content).confidence }}\"\n}",
+        "options": {}
+      },
+      "id": "893c591e-3f62-4aa8-9f17-d5ab92ea70cb",
+      "name": "Send Success Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1380, 420]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger (New Submission)": {
+      "main": [
+        [
+          {
+            "node": "Check DB for Duplicate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check DB for Duplicate": {
+      "main": [
+        [
+          {
+            "node": "Is Duplicate Candidate?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Duplicate Candidate?": {
+      "main": [
+        [
+          {
+            "node": "Send Duplicate Alert to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "LLM Skill Categorization",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLM Skill Categorization": {
+      "main": [
+        [
+          {
+            "node": "Write Tagged Candidate to DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Tagged Candidate to DB": {
+      "main": [
+        [
+          {
+            "node": "Send Success Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
