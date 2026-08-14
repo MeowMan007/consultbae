@@ -4,6 +4,22 @@ A production-grade, end-to-end multi-source data ingestion pipeline, no-code aut
 
 ---
 
+## 📌 Assessment Deliverables & Tasks Checklist
+
+Everything requested in the ConsultBae assessment is implemented and organized as follows:
+
+| # | Assessment Requirement | Implementation & File Location | Status |
+|---|---|---|:---:|
+| **Task 1** | **Multi-Source Merge Pipeline** (Ingest 3 CSVs without a common ID into 1 unified database, deduplicating records) | [`pipeline/ingest.py`](pipeline/ingest.py), [`pipeline/matcher.py`](pipeline/matcher.py), [`pipeline/models.py`](pipeline/models.py) | ✅ **Done** *(103 rows → 60 candidates)* |
+| **Task 2** | **No-Code Automation Workflow** (n8n workflow with webhook, duplicate check, and AI skill categorization) | [`automations/n8n_workflow.json`](automations/n8n_workflow.json), [`automations/README.md`](automations/README.md) | ✅ **Done** *(Exported JSON in repo)* |
+| **Task 3** | **Worker Audio Collection Web App** (In-browser mic recording/upload, extracting duration, sample rate, bitrate, loudness in dBFS, SNR, and review gallery) | [`audio_app/server.py`](audio_app/server.py), [`audio_app/audio_processor.py`](audio_app/audio_processor.py), [`audio_app/static/`](audio_app/static/) | ✅ **Done** *(Live at `http://localhost:8000`)* |
+| **Task 4** | **Data Issues Report** (Catalog of all planted data traps and programmatic remediation strategies) | [README Section: Task 4](#-task-4-data-quality--issues-report) | ✅ **Done** *(13 traps caught & resolved)* |
+| **Task 5** | **Stretch Scalability Architecture** (1-page design for scaling to 5,000 workers over a weekend) | [README Section: Task 5](#-task-5-stretch-scalability-architecture-5000-workers) | ✅ **Done** *(Cloud queue & object storage architecture)* |
+| **Log** | **Stuck Log** (2-3 authentic technical hurdles, AI prompts, rejected suggestions, and solutions) | [README Section: Stuck Log](#-stuck-log) | ✅ **Done** *(3 detailed real-world hurdles)* |
+| **Tests** | **Automated Test Suite** (Unit tests for normalization, deduplication, and audio DSP) | [`tests/`](tests/) | ✅ **Done** *(11/11 pytest tests passing)* |
+
+---
+
 ## 📹 Video Walkthrough
 
 > **Loom Video Link**: `[Insert your Loom video link here]`
