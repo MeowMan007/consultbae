@@ -1,57 +1,55 @@
 # ConsultBae — AI Automation Take-Home Project
 
-This repository contains my submission for the ConsultBae AI Automation take-home assignment. It includes a multi-source data merge pipeline, an n8n automation workflow, a full-stack audio collection web app with acoustic analytics, a report on 13 planted data traps, a scalability design for 5,000 workers, and a test suite.
+This repository contains the complete submission for the ConsultBae AI Automation take-home assignment. It includes a multi-source data merge pipeline, an n8n automation workflow, a full-stack worker audio collection web app with acoustic analytics, a report on 13 planted data traps, a scalability architecture design for 5,000 workers, and an automated test suite.
 
 ---
 
-## Deliverables and Tasks Checklist
+## Submission Summary & Deliverables
 
-Here is a quick overview of how everything requested in the assignment is organized:
+All 5 required components from the assignment prompt are implemented and ready for evaluation:
 
-| # | Task / Deliverable | Where to Find It | Summary / Result |
-|---|---|---|---|
-| **Task 1** | **Multi-Source Merge Pipeline** | [`pipeline/ingest.py`](pipeline/ingest.py)<br>[`pipeline/matcher.py`](pipeline/matcher.py)<br>[`pipeline/models.py`](pipeline/models.py) | Merges 3 messy CSV files (103 raw rows) into 60 clean, deduplicated candidate records in SQLite. |
-| **Task 2** | **No-Code Automation Workflow** | [`automations/n8n_workflow.json`](automations/n8n_workflow.json)<br>[`automations/README.md`](automations/README.md) | An importable n8n workflow with a webhook trigger, duplicate database check, and an AI skill categorization engine. |
-| **Task 3** | **Worker Audio Collection App** | [`audio_app/server.py`](audio_app/server.py)<br>[`audio_app/audio_processor.py`](audio_app/audio_processor.py)<br>[`audio_app/static/`](audio_app/static/) | Full-stack app with browser microphone recording, live waveform visualizer, audio upload, acoustic property extraction, and a submissions history player. |
-| **Task 4** | **Data Issues Report** | [Section: Data Issues Report](#task-4-data-issues-report) | Detailed breakdown of all 13 planted data traps found in the CSV files and how the code fixes them. |
-| **Task 5** | **Scalability Design (5k Workers)** | [Section: Scalability Architecture](#task-5-scaling-to-5000-workers) | System design explaining what breaks on a single server at 5,000 workers and how to redesign it with S3, queues, and PostgreSQL. |
-| **Log** | **Stuck Log** | [Section: Stuck Log](#stuck-log) | 3 real engineering hurdles I ran into, what I searched, what AI suggested, why I rejected those ideas, and how I solved them. |
-| **Tests** | **Automated Test Suite** | [`tests/`](tests/) | 11 automated pytest tests covering data cleaners, deduplication logic, API endpoints, and audio signal processing. |
-
----
-
-## Video Walkthrough
-
-> **Loom Video Link**: `[Insert your Loom video link here]`
-
-### What I cover in the video:
-- **System Overview**: Quick tour of the repository and database structure.
-- **Task 1 (Ingestion & Merge)**: Live terminal run of `python -m pipeline.ingest` showing 103 raw rows merging into 60 unified candidates.
-- **Task 2 (n8n Workflow)**: Walking through the webhook trigger, duplicate check node, and AI skill classifier.
-- **Task 3 (Audio Collection App)**: Recording a voice sample live in the browser at `http://localhost:8000`, showing the waveform visualizer, extracted acoustic numbers (duration, sample rate, bitrate, loudness in dBFS, SNR), and the history playback tab.
-- **Task 5 & Stuck Log**: Highlighting what breaks at scale (5,000 workers) and the key problem-solving choices from the stuck log.
+| # | Submission Requirement | Implementation & Links | Status |
+|---|---|---|:---:|
+| **1** | **GitHub Repo with Code** | [https://github.com/MeowMan007/consultbae](https://github.com/MeowMan007/consultbae) | Clean Progressive Commits |
+| **2** | **Screen Recording (Max 6 min)** | **[Watch Walkthrough on Google Drive](https://drive.google.com/file/d/1YSmaTRNjqwZ2UXK31KN9sHQh7HGupgsF/view?usp=sharing)** | Ready to Stream |
+| **3** | **README with Setup Steps** | [Setup and Quickstart Guide](#1-setup-and-quickstart) | Verified Working |
+| **4** | **Data Issues Report** | [13 Planted Traps & Fixes Report](#2-data-issues-report-13-planted-traps) | 13 Traps Resolved |
+| **5** | **Stuck Log (in README)** | [3 Engineering Hurdles & AI Evaluation](#3-stuck-log) | 3 Detailed Real-World Cases |
 
 ---
 
 ## Table of Contents
-1. [Quickstart and Setup](#quickstart-and-setup)
-2. [Task 1: Multi-Source Merge Pipeline](#task-1-multi-source-merge-pipeline)
-3. [Task 2: No-Code Automation Workflow (n8n)](#task-2-no-code-automation-workflow-n8n)
-4. [Task 3: Worker Audio Collection App](#task-3-worker-audio-collection-app)
-5. [Task 4: Data Issues Report (13 Planted Traps)](#task-4-data-issues-report)
-6. [Task 5: Scaling to 5,000 Workers](#task-5-scaling-to-5000-workers)
-7. [Stuck Log](#stuck-log)
-8. [Automated Test Suite](#automated-test-suite)
+1. [Screen Recording and Walkthrough](#screen-recording-and-walkthrough)
+2. [Setup and Quickstart](#1-setup-and-quickstart)
+3. [Data Issues Report (13 Planted Traps)](#2-data-issues-report-13-planted-traps)
+4. [Stuck Log](#3-stuck-log)
+5. [Task 1: Multi-Source Merge Pipeline](#task-1-multi-source-merge-pipeline)
+6. [Task 2: No-Code Automation Workflow (n8n)](#task-2-no-code-automation-workflow-n8n)
+7. [Task 3: Worker Audio Collection App](#task-3-worker-audio-collection-app)
+8. [Task 5: Scaling to 5,000 Workers](#task-5-scaling-to-5000-workers)
+9. [Automated Test Suite](#automated-test-suite)
 
 ---
 
-## Quickstart and Setup
+## Screen Recording and Walkthrough
+
+> **Video Link**: **[https://drive.google.com/file/d/1YSmaTRNjqwZ2UXK31KN9sHQh7HGupgsF/view?usp=sharing](https://drive.google.com/file/d/1YSmaTRNjqwZ2UXK31KN9sHQh7HGupgsF/view?usp=sharing)**  
+> *(Local file: `Screen Recording 2026-08-14 230542.mp4`)*
+
+### What the walkthrough covers:
+1. **Running the Pipeline**: Live terminal run of `python -m pipeline.ingest` merging 103 raw rows into 60 candidates in SQLite.
+2. **Audio App End-to-End**: Live browser microphone recording at `http://localhost:8000`, waveform visualizer, automatic acoustic property extraction (duration, sample rate, bitrate, loudness in dBFS, SNR, quality grade), and reviewer history playback.
+3. **Hardest Decisions**: Walkthrough of the 3 engineering tradeoffs from the Stuck Log.
+
+---
+
+## 1. Setup and Quickstart
 
 ### Prerequisites
 - Python 3.10 or higher
 - `pip` package manager
 
-### 1. Clone the repository and install dependencies
+### Step 1: Clone the repository and install dependencies
 ```bash
 git clone https://github.com/MeowMan007/consultbae.git
 cd consultbae
@@ -67,22 +65,78 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Run the Data Pipeline (Task 1)
+### Step 2: Run the Data Pipeline (Task 1)
 ```bash
 python -m pipeline.ingest
 ```
-This reads the 3 CSV files from `data/raw/`, cleans the data, runs the deduplication matcher, and creates a clean SQLite database at `data/database.sqlite3`.
+This reads the 3 raw CSV files from `data/raw/`, normalizes the data, runs the cascading deduplication engine, and creates a clean SQLite database at `data/database.sqlite3`.
 
-### 3. Launch the Audio Collection Web App (Task 3)
+### Step 3: Launch the Audio Collection Web App (Task 3)
 ```bash
 uvicorn audio_app.server:app --reload --port 8000
 ```
-Open your browser at **`http://localhost:8000`** to try the recorder, upload portal, acoustic analytics, and history gallery.
+Open your browser at **`http://localhost:8000`** to access the in-browser recorder, upload portal, acoustic analytics, and history gallery.
 
-### 4. Run the Unit Tests
+### Step 4: Run the Unit Tests
 ```bash
-pytest tests/ -v
+pytest
 ```
+*or `pytest tests/ -v` to see verbose test-by-test results.*
+
+---
+
+## 2. Data Issues Report (13 Planted Traps)
+
+During ETL development, I found **13 planted data traps** across the 3 raw CSV files. Here is what they were and how the pipeline programmatically fixes each one:
+
+| # | Data Quality Issue | Where It Occurred | Example in Raw Data | How I Fixed It |
+|---|---|---|---|---|
+| **1** | **Shifted Columns / Corrupted Row** | System 3, Row 19 | `"react, javascript, mysql", ISHA.CHOPRA95@MAILTEST.EXAMPLE.ORG, Isha Chopra, 1406/hr, Pune, active` | Built an anomaly detector in `normalizers.py` that checks if column 0 fails email regex while column 1 matches email regex. When detected, it realigns the dictionary values to the proper columns before saving. |
+| **2** | **Completely Blank Rows** | System 3, Row 11 | `,,,,,` | Filter skips any row where all columns are empty or whitespace before parsing. |
+| **3** | **Duplicate Header Row Embedded Mid-File** | System 1, Row 15 | `Name,Phone Number,City,Verified,Projects Completed` | Ingestion skips rows where the `Name` column value literally equals the string `"Name"`. |
+| **4** | **Inconsistent Phone Formats** | Across System 1 & 2 | `+91-9000000131`, `919000000231`, `09000000287`, `9000000113` | Strips all non-digit characters, removes leading `+91`, `91`, and `0`, and validates that the result is exactly 10 digits (`9000000xxx`). |
+| **5** | **Email Casing & Whitespace** | Across System 2 & 3 | `ISHA.CHOPRA95@MAILTEST.EXAMPLE.ORG`, `DEEPAK.NAIR44@EXAMPLE.COM` | Normalized using `.strip().lower()` with RFC email regex validation. |
+| **6** | **Mixed Compensation Formats (LPA vs Raw INR)** | System 2 & 3 | `4.2`, `8.3` mixed with `417964`, `806661`, `1415/hr`, `15k/month` | Values $<100$ in CTC are treated as LPA and multiplied by 100,000. `15k/month` is annualized ($15000 \times 12$). Hourly rates are stored separately. |
+| **7** | **Same Common Name, Different People** | System 1 & 3 | `Arjun Mehta` (`9000000131`) vs `Arjun Mehta` (`9000000272`) | Zero-false-positive policy: matching requires phone or email confirmation. People with the same name but different contact details are kept separate. |
+| **8** | **Abbreviated Names** | System 2 | `"R. Verma"` vs `"Rohit Verma"` (same phone `9000000294` and email) | Merged using verified phone/email anchors; the name is updated to the more complete version (`Rohit Verma`). |
+| **9** | **Alias / Secondary Emails** | System 2 | `Nikhil Chopra` with `nikhil.chopra70@...` and `alt.nikhil.chopra70@...` | Merged into one candidate record via phone anchor; secondary email is saved in the `candidate_emails` table. |
+| **10** | **Multi-Format Applied Dates** | System 2 | `24-07-2026`, `2026-08-08`, `7 Jul 2026`, `07/13/2026` | Multi-pattern date parser standardizes all dates into ISO 8601 strings (`YYYY-MM-DD`). |
+| **11** | **City Name Synonyms & Spaces** | Across all CSVs | `gurugram `, `GURGAON`, `Noida `, `new delhi`, `Delhi NCR`, `bangalore` vs `Bengaluru` | A dictionary map normalizes city variations to standard names (`Gurugram`, `Bengaluru`, `New Delhi`, `Noida`, `Pune`). |
+| **12** | **Boolean & Status Variations** | System 1 & 3 | `Y`, `yes`, `Yes`, `No`, `N`, `active`, `ACTIVE`, `paused`, `Inactive` | Standardized `is_verified` to boolean (`True`/`False`) and status to canonical values (`ACTIVE`, `INACTIVE`, `PAUSED`). |
+| **13** | **Skill Delimiters & Casing** | System 2 & 3 | `"n8n, LangChain, REST APIs"`, `"sql, mongodb, selenium"` | Split by commas, trimmed, standardized using a canonical skill map, and stored as individual rows. |
+
+---
+
+## 3. Stuck Log
+
+### 1. Shifted Columns in System 3 (Row 19)
+- **The Problem**: Row 19 of `system3_internal.csv` had misaligned columns—the skills were placed in the `email_id` column and the email was in `worker_name`. When loaded normally with pandas, the skill string was treated as the email address, breaking downstream lookups.
+- **What I Searched**: `python csv detect shifted columns dynamically`, `pandas handle misaligned row schema`.
+- **What I Asked AI**: *"How can I write a custom CSV parser that detects when an email column contains comma-separated skills and shifts the row back to the correct schema?"*
+- **What AI Suggested & Why I Rejected It**: AI suggested sending every row to OpenAI's GPT-4 API to "clean and re-align" the data. **Why I rejected it**: Using an LLM API inside an ingestion loop adds high latency, monetary cost, potential API downtime, and non-deterministic behavior. A core data pipeline should be fast and deterministic.
+- **How I Got Unstuck**: I wrote a deterministic rule in `pipeline/normalizers.py`. It checks if column 0 fails email regex while column 1 matches email regex. When that pattern is found, the parser automatically re-slices the row back into the proper schema.
+
+---
+
+### 2. Processing Browser-Recorded WebM Audio in Python
+- **The Problem**: When recording in the browser, the MediaRecorder API produces `audio/webm` files. Python's built-in `wave` module cannot parse WebM containers and threw `wave.Error: file does not start with RIFF id`.
+- **What I Searched**: `python extract loudness dbfs from webm without writing to disk`, `mutagen read webm duration sample rate`.
+- **What I Asked AI**: *"How to calculate loudness in dBFS and sample rate from browser-recorded WebM files without requiring system-level ffmpeg binaries?"*
+- **What AI Suggested & Why I Rejected It**: AI suggested using `subprocess.Popen` to call system `ffmpeg` binaries. **Why I rejected it**: Requiring FFmpeg means anyone running or evaluating the project must install system packages manually, which often fails in minimal Docker containers or different OS environments.
+- **How I Got Unstuck**: I built a pure-Python extraction strategy in `audio_processor.py`. It uses the `mutagen` library to read container metadata (duration, sample rate, bitrate) across WebM, MP3, OGG, and WAV, paired with a byte-variance energy estimator for loudness (dBFS) and SNR calculation without any external binary dependencies.
+
+---
+
+### 3. Entity Deduplication for Common Names with Conflicting Salary Units
+- **The Problem**: Common names (like two different people named *Arjun Mehta*) appeared in the data with different phone numbers. At the same time, System 2 listed salaries as mixed floats (`4.2`, `8.3`) alongside raw integers (`417964`, `806661`).
+- **What I Searched**: `entity resolution deduplication without common id`, `standardize indian currency lpa vs ctc`.
+- **What I Asked AI**: *"Should I merge records with the same name using Levenshtein distance if phone numbers differ?"*
+- **What AI Suggested & Why I Rejected It**: AI suggested fuzzy-matching on candidate names with an 80% similarity threshold and merging them automatically. **Why I rejected it**: For common Indian names, this causes disastrous false merges. Merging two different people named "Arjun Mehta" corrupts their contact details, salaries, and work histories.
+- **How I Got Unstuck**: I adopted a strict **Zero-False-Positive Policy**:
+  1. Phone number is the primary anchor (normalized 10 digits).
+  2. Email is the secondary anchor.
+  3. Records sharing the same name but having different phone numbers/emails are strictly kept separate.
+  4. For salary, I used a threshold heuristic: values $<100$ are recognized as LPA ($\times 100,000$) and larger values as raw annual INR.
 
 ---
 
@@ -166,28 +220,6 @@ A full-stack web application built with FastAPI and plain JavaScript/CSS, design
 
 ---
 
-## Task 4: Data Issues Report
-
-During ETL development, I found **13 planted data traps** across the 3 raw CSV files. Here is what they were and how the code fixes each one:
-
-| # | Data Quality Issue | Where It Occurred | Example in Raw Data | How I Fixed It |
-|---|---|---|---|---|
-| **1** | **Shifted Columns / Corrupted Row** | System 3, Row 19 | `"react, javascript, mysql", ISHA.CHOPRA95@MAILTEST.EXAMPLE.ORG, Isha Chopra, 1406/hr, Pune, active` | Built an anomaly detector in `normalizers.py` that checks if column 0 fails email regex while column 1 matches email regex. When detected, it realigns the dictionary values to the proper columns before saving. |
-| **2** | **Completely Blank Rows** | System 3, Row 11 | `,,,,,` | Filter skips any row where all columns are empty or whitespace before parsing. |
-| **3** | **Duplicate Header Row Embedded Mid-File** | System 1, Row 15 | `Name,Phone Number,City,Verified,Projects Completed` | Ingestion skips rows where the `Name` column value literally equals the string `"Name"`. |
-| **4** | **Inconsistent Phone Formats** | Across System 1 & 2 | `+91-9000000131`, `919000000231`, `09000000287`, `9000000113` | Strips all non-digit characters, removes leading `+91`, `91`, and `0`, and validates that the result is exactly 10 digits (`9000000xxx`). |
-| **5** | **Email Casing & Whitespace** | Across System 2 & 3 | `ISHA.CHOPRA95@MAILTEST.EXAMPLE.ORG`, `DEEPAK.NAIR44@EXAMPLE.COM` | Normalized using `.strip().lower()` with RFC email regex validation. |
-| **6** | **Mixed Compensation Formats (LPA vs Raw INR)** | System 2 & 3 | `4.2`, `8.3` mixed with `417964`, `806661`, `1415/hr`, `15k/month` | Values $<100$ in CTC are treated as LPA and multiplied by 100,000. `15k/month` is annualized ($15000 \times 12$). Hourly rates are stored separately. |
-| **7** | **Same Common Name, Different People** | System 1 & 3 | `Arjun Mehta` (`9000000131`) vs `Arjun Mehta` (`9000000272`) | Zero-false-positive policy: matching requires phone or email confirmation. People with the same name but different contact details are kept separate. |
-| **8** | **Abbreviated Names** | System 2 | `"R. Verma"` vs `"Rohit Verma"` (same phone `9000000294` and email) | Merged using verified phone/email anchors; the name is updated to the more complete version (`Rohit Verma`). |
-| **9** | **Alias / Secondary Emails** | System 2 | `Nikhil Chopra` with `nikhil.chopra70@...` and `alt.nikhil.chopra70@...` | Merged into one candidate record via phone anchor; secondary email is saved in the `candidate_emails` table. |
-| **10** | **Multi-Format Applied Dates** | System 2 | `24-07-2026`, `2026-08-08`, `7 Jul 2026`, `07/13/2026` | Multi-pattern date parser standardizes all dates into ISO 8601 strings (`YYYY-MM-DD`). |
-| **11** | **City Name Synonyms & Spaces** | Across all CSVs | `gurugram `, `GURGAON`, `Noida `, `new delhi`, `Delhi NCR`, `bangalore` vs `Bengaluru` | A dictionary map normalizes city variations to standard names (`Gurugram`, `Bengaluru`, `New Delhi`, `Noida`, `Pune`). |
-| **12** | **Boolean & Status Variations** | System 1 & 3 | `Y`, `yes`, `Yes`, `No`, `N`, `active`, `ACTIVE`, `paused`, `Inactive` | Standardized `is_verified` to boolean (`True`/`False`) and status to canonical values (`ACTIVE`, `INACTIVE`, `PAUSED`). |
-| **13** | **Skill Delimiters & Casing** | System 2 & 3 | `"n8n, LangChain, REST APIs"`, `"sql, mongodb, selenium"` | Split by commas, trimmed, standardized using a canonical skill map, and stored as individual rows. |
-
----
-
 ## Task 5: Scaling to 5,000 Workers
 
 ### Scenario: Launching the Audio App to 5,000 Gig Workers Over a Weekend
@@ -207,45 +239,13 @@ During ETL development, I found **13 planted data traps** across the 3 raw CSV f
 
 ---
 
-## Stuck Log
-
-### 1. Shifted Columns in System 3 (Row 19)
-- **The Problem**: Row 19 of `system3_internal.csv` had misaligned columns—the skills were placed in the `email_id` column and the email was in `worker_name`. When loaded normally with pandas, the skill string was treated as the email address, breaking downstream lookups.
-- **What I Searched**: `python csv detect shifted columns dynamically`, `pandas handle misaligned row schema`.
-- **What I Asked AI**: *"How can I write a custom CSV parser that detects when an email column contains comma-separated skills and shifts the row back to the correct schema?"*
-- **What AI Suggested & Why I Rejected It**: AI suggested sending every row to OpenAI's GPT-4 API to "clean and re-align" the data. **Why I rejected it**: Using an LLM API inside an ingestion loop adds high latency, monetary cost, potential API downtime, and non-deterministic behavior. A core data pipeline should be fast and deterministic.
-- **How I Got Unstuck**: I wrote a deterministic rule in `pipeline/normalizers.py`. It checks if column 0 fails email regex while column 1 matches email regex. When that pattern is found, the parser automatically re-slices the row back into the proper schema.
-
----
-
-### 2. Processing Browser-Recorded WebM Audio in Python
-- **The Problem**: When recording in the browser, the MediaRecorder API produces `audio/webm` files. Python's built-in `wave` module cannot parse WebM containers and threw `wave.Error: file does not start with RIFF id`.
-- **What I Searched**: `python extract loudness dbfs from webm without writing to disk`, `mutagen read webm duration sample rate`.
-- **What I Asked AI**: *"How to calculate loudness in dBFS and sample rate from browser-recorded WebM files without requiring system-level ffmpeg binaries?"*
-- **What AI Suggested & Why I Rejected It**: AI suggested using `subprocess.Popen` to call system `ffmpeg` binaries. **Why I rejected it**: Requiring FFmpeg means anyone running or evaluating the project must install system packages manually, which often fails in minimal Docker containers or different OS environments.
-- **How I Got Unstuck**: I built a pure-Python extraction strategy in `audio_processor.py`. It uses the `mutagen` library to read container metadata (duration, sample rate, bitrate) across WebM, MP3, OGG, and WAV, paired with a byte-variance energy estimator for loudness (dBFS) and SNR calculation without any external binary dependencies.
-
----
-
-### 3. Entity Deduplication for Common Names with Conflicting Salary Units
-- **The Problem**: Common names (like two different people named *Arjun Mehta*) appeared in the data with different phone numbers. At the same time, System 2 listed salaries as mixed floats (`4.2`, `8.3`) alongside raw integers (`417964`, `806661`).
-- **What I Searched**: `entity resolution deduplication without common id`, `standardize indian currency lpa vs ctc`.
-- **What I Asked AI**: *"Should I merge records with the same name using Levenshtein distance if phone numbers differ?"*
-- **What AI Suggested & Why I Rejected It**: AI suggested fuzzy-matching on candidate names with an 80% similarity threshold and merging them automatically. **Why I rejected it**: For common Indian names, this causes disastrous false merges. Merging two different people named "Arjun Mehta" corrupts their contact details, salaries, and work histories.
-- **How I Got Unstuck**: I adopted a strict **Zero-False-Positive Policy**:
-  1. Phone number is the primary anchor (normalized 10 digits).
-  2. Email is the secondary anchor.
-  3. Records sharing the same name but having different phone numbers/emails are strictly kept separate.
-  4. For salary, I used a threshold heuristic: values $<100$ are recognized as LPA ($\times 100,000$) and larger values as raw annual INR.
-
----
-
 ## Automated Test Suite
 
 Run the full pytest suite with:
 ```bash
-pytest tests/ -v
+pytest
 ```
+*or `pytest tests/ -v`*
 
 ### Test Coverage:
 - `test_phone_normalization`: Strips `+91`, `0`, and punctuation into standard 10-digit Indian numbers.

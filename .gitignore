@@ -20,6 +20,11 @@ uploads/
 audio_storage/
 audio_app/storage/
 
+# Large Media
+*.mp4
+*.mkv
+*.mov
+
 # System / IDE
 .DS_Store
 Thumbs.db
