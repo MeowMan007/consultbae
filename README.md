@@ -4,7 +4,7 @@ This repository contains my submission for the ConsultBae AI Automation take-hom
 
 ---
 
-## 📌 Deliverables & Tasks Checklist
+## Deliverables and Tasks Checklist
 
 Here is a quick overview of how everything requested in the assignment is organized:
 
@@ -13,14 +13,14 @@ Here is a quick overview of how everything requested in the assignment is organi
 | **Task 1** | **Multi-Source Merge Pipeline** | [`pipeline/ingest.py`](pipeline/ingest.py)<br>[`pipeline/matcher.py`](pipeline/matcher.py)<br>[`pipeline/models.py`](pipeline/models.py) | Merges 3 messy CSV files (103 raw rows) into 60 clean, deduplicated candidate records in SQLite. |
 | **Task 2** | **No-Code Automation Workflow** | [`automations/n8n_workflow.json`](automations/n8n_workflow.json)<br>[`automations/README.md`](automations/README.md) | An importable n8n workflow with a webhook trigger, duplicate database check, and an AI skill categorization engine. |
 | **Task 3** | **Worker Audio Collection App** | [`audio_app/server.py`](audio_app/server.py)<br>[`audio_app/audio_processor.py`](audio_app/audio_processor.py)<br>[`audio_app/static/`](audio_app/static/) | Full-stack app with browser microphone recording, live waveform visualizer, audio upload, acoustic property extraction, and a submissions history player. |
-| **Task 4** | **Data Issues Report** | [Section: Data Issues Report](#-task-4-data-issues-report) | Detailed breakdown of all 13 planted data traps found in the CSV files and how the code fixes them. |
-| **Task 5** | **Scalability Design (5k Workers)** | [Section: Scalability Architecture](#-task-5-scaling-to-5000-workers) | System design explaining what breaks on a single server at 5,000 workers and how to redesign it with S3, queues, and PostgreSQL. |
-| **Log** | **Stuck Log** | [Section: Stuck Log](#-stuck-log) | 3 real engineering hurdles I ran into, what I searched, what AI suggested, why I rejected those ideas, and how I solved them. |
+| **Task 4** | **Data Issues Report** | [Section: Data Issues Report](#task-4-data-issues-report) | Detailed breakdown of all 13 planted data traps found in the CSV files and how the code fixes them. |
+| **Task 5** | **Scalability Design (5k Workers)** | [Section: Scalability Architecture](#task-5-scaling-to-5000-workers) | System design explaining what breaks on a single server at 5,000 workers and how to redesign it with S3, queues, and PostgreSQL. |
+| **Log** | **Stuck Log** | [Section: Stuck Log](#stuck-log) | 3 real engineering hurdles I ran into, what I searched, what AI suggested, why I rejected those ideas, and how I solved them. |
 | **Tests** | **Automated Test Suite** | [`tests/`](tests/) | 11 automated pytest tests covering data cleaners, deduplication logic, API endpoints, and audio signal processing. |
 
 ---
 
-## 📹 Video Walkthrough
+## Video Walkthrough
 
 > **Loom Video Link**: `[Insert your Loom video link here]`
 
@@ -33,19 +33,19 @@ Here is a quick overview of how everything requested in the assignment is organi
 
 ---
 
-## 📑 Table of Contents
-1. [Quickstart & Setup](#-quickstart--setup)
-2. [Task 1: Multi-Source Merge Pipeline](#-task-1-multi-source-merge-pipeline)
-3. [Task 2: No-Code Automation Workflow (n8n)](#-task-2-no-code-automation-workflow-n8n)
-4. [Task 3: Worker Audio Collection App](#-task-3-worker-audio-collection-app)
-5. [Task 4: Data Issues Report (13 Planted Traps)](#-task-4-data-issues-report)
-6. [Task 5: Scaling to 5,000 Workers](#-task-5-scaling-to-5000-workers)
-7. [Stuck Log](#-stuck-log)
-8. [Automated Test Suite](#-automated-test-suite)
+## Table of Contents
+1. [Quickstart and Setup](#quickstart-and-setup)
+2. [Task 1: Multi-Source Merge Pipeline](#task-1-multi-source-merge-pipeline)
+3. [Task 2: No-Code Automation Workflow (n8n)](#task-2-no-code-automation-workflow-n8n)
+4. [Task 3: Worker Audio Collection App](#task-3-worker-audio-collection-app)
+5. [Task 4: Data Issues Report (13 Planted Traps)](#task-4-data-issues-report)
+6. [Task 5: Scaling to 5,000 Workers](#task-5-scaling-to-5000-workers)
+7. [Stuck Log](#stuck-log)
+8. [Automated Test Suite](#automated-test-suite)
 
 ---
 
-## ⚡ Quickstart & Setup
+## Quickstart and Setup
 
 ### Prerequisites
 - Python 3.10 or higher
@@ -86,7 +86,7 @@ pytest tests/ -v
 
 ---
 
-## 🗄️ Task 1: Multi-Source Merge Pipeline
+## Task 1: Multi-Source Merge Pipeline
 
 The goal of Task 1 was to take 3 separate, messy CSV files from different internal systems and combine them into one clean database without duplicate records.
 
@@ -119,7 +119,7 @@ There is no shared primary key across the three systems:
 
 ---
 
-## 🤖 Task 2: No-Code Automation Workflow (n8n)
+## Task 2: No-Code Automation Workflow (n8n)
 
 The exported workflow file is located at [`automations/n8n_workflow.json`](automations/n8n_workflow.json).
 
@@ -148,7 +148,7 @@ The exported workflow file is located at [`automations/n8n_workflow.json`](autom
 
 ---
 
-## 🎙️ Task 3: Worker Audio Collection App
+## Task 3: Worker Audio Collection App
 
 A full-stack web application built with FastAPI and plain JavaScript/CSS, designed for crowdsourced speech collection.
 
@@ -159,14 +159,14 @@ A full-stack web application built with FastAPI and plain JavaScript/CSS, design
   - **Duration**: Extracted from audio container headers or calculated from WAV frame counts.
   - **Sample Rate (kHz)**: Sampling frequency (e.g., 44.1 kHz or 48.0 kHz).
   - **Bitrate (kbps)**: Data rate of the recording.
-  - **Loudness in dBFS**: Calculated using Root-Mean-Square (RMS) amplitude relative to 16-bit digital full scale ($20 \log_{10}(\text{RMS} / 32768)$).
+  - **Loudness in dBFS**: Calculated using Root-Mean-Square (RMS) amplitude relative to 16-bit digital full scale.
   - **Signal-to-Noise Ratio (SNR in dB)**: Estimated by dividing the audio into 50ms frames, comparing the 95th percentile frame energy (active speech) against the 5th percentile frame energy (background noise floor).
   - **Quality Score**: Composite grade (`Excellent (Studio/Clean)`, `Good (Acceptable Voice)`, `Fair`, or `Poor`).
 - **Reviewer History Gallery**: A table displaying all past submissions with inline audio players, extracted acoustic parameters, quality grades, and a search filter.
 
 ---
 
-## 📊 Task 4: Data Issues Report
+## Task 4: Data Issues Report
 
 During ETL development, I found **13 planted data traps** across the 3 raw CSV files. Here is what they were and how the code fixes each one:
 
@@ -188,7 +188,7 @@ During ETL development, I found **13 planted data traps** across the 3 raw CSV f
 
 ---
 
-## 📈 Task 5: Scaling to 5,000 Workers
+## Task 5: Scaling to 5,000 Workers
 
 ### Scenario: Launching the Audio App to 5,000 Gig Workers Over a Weekend
 
@@ -207,7 +207,7 @@ During ETL development, I found **13 planted data traps** across the 3 raw CSV f
 
 ---
 
-## 🛠️ Stuck Log
+## Stuck Log
 
 ### 1. Shifted Columns in System 3 (Row 19)
 - **The Problem**: Row 19 of `system3_internal.csv` had misaligned columns—the skills were placed in the `email_id` column and the email was in `worker_name`. When loaded normally with pandas, the skill string was treated as the email address, breaking downstream lookups.
@@ -240,7 +240,7 @@ During ETL development, I found **13 planted data traps** across the 3 raw CSV f
 
 ---
 
-## 🧪 Automated Test Suite
+## Automated Test Suite
 
 Run the full pytest suite with:
 ```bash
