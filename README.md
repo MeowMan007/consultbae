@@ -1,22 +1,22 @@
-# ConsultBae — AI Automation Take-Home Assessment
+# ConsultBae — AI Automation Take-Home Project
 
-A production-grade, end-to-end multi-source data ingestion pipeline, no-code automation workflow, and worker audio collection web application with real-time acoustic analytics.
+This repository contains my submission for the ConsultBae AI Automation take-home assignment. It includes a multi-source data merge pipeline, an n8n automation workflow, a full-stack audio collection web app with acoustic analytics, a report on 13 planted data traps, a scalability design for 5,000 workers, and a test suite.
 
 ---
 
-## 📌 Assessment Deliverables & Tasks Checklist
+## 📌 Deliverables & Tasks Checklist
 
-Everything requested in the ConsultBae assessment is implemented and organized as follows:
+Here is a quick overview of how everything requested in the assignment is organized:
 
-| # | Assessment Requirement | Implementation & File Location | Status |
-|---|---|---|:---:|
-| **Task 1** | **Multi-Source Merge Pipeline** (Ingest 3 CSVs without a common ID into 1 unified database, deduplicating records) | [`pipeline/ingest.py`](pipeline/ingest.py), [`pipeline/matcher.py`](pipeline/matcher.py), [`pipeline/models.py`](pipeline/models.py) | ✅ **Done** *(103 rows → 60 candidates)* |
-| **Task 2** | **No-Code Automation Workflow** (n8n workflow with webhook, duplicate check, and AI skill categorization) | [`automations/n8n_workflow.json`](automations/n8n_workflow.json), [`automations/README.md`](automations/README.md) | ✅ **Done** *(Exported JSON in repo)* |
-| **Task 3** | **Worker Audio Collection Web App** (In-browser mic recording/upload, extracting duration, sample rate, bitrate, loudness in dBFS, SNR, and review gallery) | [`audio_app/server.py`](audio_app/server.py), [`audio_app/audio_processor.py`](audio_app/audio_processor.py), [`audio_app/static/`](audio_app/static/) | ✅ **Done** *(Live at `http://localhost:8000`)* |
-| **Task 4** | **Data Issues Report** (Catalog of all planted data traps and programmatic remediation strategies) | [README Section: Task 4](#-task-4-data-quality--issues-report) | ✅ **Done** *(13 traps caught & resolved)* |
-| **Task 5** | **Stretch Scalability Architecture** (1-page design for scaling to 5,000 workers over a weekend) | [README Section: Task 5](#-task-5-stretch-scalability-architecture-5000-workers) | ✅ **Done** *(Cloud queue & object storage architecture)* |
-| **Log** | **Stuck Log** (2-3 authentic technical hurdles, AI prompts, rejected suggestions, and solutions) | [README Section: Stuck Log](#-stuck-log) | ✅ **Done** *(3 detailed real-world hurdles)* |
-| **Tests** | **Automated Test Suite** (Unit tests for normalization, deduplication, and audio DSP) | [`tests/`](tests/) | ✅ **Done** *(11/11 pytest tests passing)* |
+| # | Task / Deliverable | Where to Find It | Summary / Result |
+|---|---|---|---|
+| **Task 1** | **Multi-Source Merge Pipeline** | [`pipeline/ingest.py`](pipeline/ingest.py)<br>[`pipeline/matcher.py`](pipeline/matcher.py)<br>[`pipeline/models.py`](pipeline/models.py) | Merges 3 messy CSV files (103 raw rows) into 60 clean, deduplicated candidate records in SQLite. |
+| **Task 2** | **No-Code Automation Workflow** | [`automations/n8n_workflow.json`](automations/n8n_workflow.json)<br>[`automations/README.md`](automations/README.md) | An importable n8n workflow with a webhook trigger, duplicate database check, and an AI skill categorization engine. |
+| **Task 3** | **Worker Audio Collection App** | [`audio_app/server.py`](audio_app/server.py)<br>[`audio_app/audio_processor.py`](audio_app/audio_processor.py)<br>[`audio_app/static/`](audio_app/static/) | Full-stack app with browser microphone recording, live waveform visualizer, audio upload, acoustic property extraction, and a submissions history player. |
+| **Task 4** | **Data Issues Report** | [Section: Data Issues Report](#-task-4-data-issues-report) | Detailed breakdown of all 13 planted data traps found in the CSV files and how the code fixes them. |
+| **Task 5** | **Scalability Design (5k Workers)** | [Section: Scalability Architecture](#-task-5-scaling-to-5000-workers) | System design explaining what breaks on a single server at 5,000 workers and how to redesign it with S3, queues, and PostgreSQL. |
+| **Log** | **Stuck Log** | [Section: Stuck Log](#-stuck-log) | 3 real engineering hurdles I ran into, what I searched, what AI suggested, why I rejected those ideas, and how I solved them. |
+| **Tests** | **Automated Test Suite** | [`tests/`](tests/) | 11 automated pytest tests covering data cleaners, deduplication logic, API endpoints, and audio signal processing. |
 
 ---
 
@@ -24,117 +24,62 @@ Everything requested in the ConsultBae assessment is implemented and organized a
 
 > **Loom Video Link**: `[Insert your Loom video link here]`
 
-### Walkthrough Outline
-- **System Overview & Architecture**: Walkthrough of SQLite relational database design and pipeline structure.
-- **Task 1 (Ingestion & Merge)**: Live terminal run of `python -m pipeline.ingest` (103 raw rows ingested into 60 clean candidates, catching 13 planted data traps).
-- **Task 2 (n8n Automation)**: Workflow walkthrough showing Webhook trigger, duplicate verification against DB, and AI skill categorization (`automation-heavy`, `web-dev`, `data-engineering`, `ai-ml`).
-- **Task 3 (Worker Audio Collection)**: Live in-browser microphone recording at `http://localhost:8000`, waveform visualizer, automatic acoustic feature extraction (duration, sample rate, bitrate, loudness in dBFS, SNR, quality grade), and reviewer history playback.
-- **Task 5 (Scalability Design) & Stuck Log**: Review of 5,000-worker cloud architecture (S3 presigned URLs, SQS, Celery, PostgreSQL) and key problem-solving decisions from the stuck log.
+### What I cover in the video:
+- **System Overview**: Quick tour of the repository and database structure.
+- **Task 1 (Ingestion & Merge)**: Live terminal run of `python -m pipeline.ingest` showing 103 raw rows merging into 60 unified candidates.
+- **Task 2 (n8n Workflow)**: Walking through the webhook trigger, duplicate check node, and AI skill classifier.
+- **Task 3 (Audio Collection App)**: Recording a voice sample live in the browser at `http://localhost:8000`, showing the waveform visualizer, extracted acoustic numbers (duration, sample rate, bitrate, loudness in dBFS, SNR), and the history playback tab.
+- **Task 5 & Stuck Log**: Highlighting what breaks at scale (5,000 workers) and the key problem-solving choices from the stuck log.
 
 ---
 
 ## 📑 Table of Contents
-1. [Video Walkthrough](#-video-walkthrough)
-2. [Architecture Overview](#-architecture-overview)
-3. [Quickstart & Setup](#-quickstart--setup)
-4. [Task 1: Multi-Source Merge Pipeline](#-task-1-multi-source-merge-pipeline)
-5. [Task 2: No-Code Automation Workflow (n8n)](#-task-2-no-code-automation-workflow-n8n)
-6. [Task 3: Audio Collection Web App & Acoustic Processor](#-task-3-audio-collection-web-app--acoustic-processor)
-7. [Task 4: Data Quality & Issues Report (Planted Traps)](#-task-4-data-quality--issues-report)
-8. [Task 5: Stretch Scalability Architecture (5,000 Workers)](#-task-5-stretch-scalability-architecture-5000-workers)
-9. [Stuck Log (Engineering Hurdles & AI Evaluation)](#-stuck-log)
-10. [Test Suite & Verification](#-test-suite--verification)
-
----
-
-## 🏗️ Architecture Overview
-
-```mermaid
-graph TD
-    subgraph "Data Sources (Intentionally Imperfect)"
-        S1[System 1: Recruitment CSV<br/>Phone, Projects, Verification]
-        S2[System 2: CBNexus CSV<br/>Email, Phone, CTC, Skills, Dates]
-        S3[System 3: Internal Automations CSV<br/>Email, Rates, Status, Skills]
-    end
-
-    subgraph "Task 1: ETL & Entity Resolution Pipeline"
-        Norm[Data Normalizers<br/>Phone E.164, Email RFC, LPA/CTC, City Map, Shifted Row Fixer]
-        Matcher[Deterministic Cascading Entity Matcher<br/>Phone Primary -> Email Secondary -> Disambiguation]
-        DB[(Unified SQLite Database<br/>Candidates, Profiles, Compensations, Skills, Audits)]
-    end
-
-    subgraph "Task 2: No-Code Automation"
-        N8N[n8n Workflow Engine]
-        Webhook[Webhook Trigger]
-        DedupeCheck[Duplicate DB Verification]
-        LLM[OpenAI / Claude LLM Skill Tagging]
-        SlackAlert[Slack / Webhook Alerts]
-    end
-
-    subgraph "Task 3: Worker Audio Studio"
-        WebUI[Glassmorphism UI<br/>In-Browser Mic Recorder + Waveform Visualizer + Upload]
-        API[FastAPI Backend Server]
-        Acoustic[Acoustic Feature Extractor<br/>Duration, Sample Rate, Bitrate, Loudness dBFS, SNR, Quality]
-        Storage[(Local Audio File Storage)]
-        Gallery[Auditor Review Table & Player]
-    end
-
-    S1 --> Norm
-    S2 --> Norm
-    S3 --> Norm
-    Norm --> Matcher
-    Matcher --> DB
-
-    Webhook --> DedupeCheck
-    DedupeCheck -->|Duplicate| SlackAlert
-    DedupeCheck -->|New Candidate| LLM
-    LLM --> DB
-    LLM --> SlackAlert
-
-    WebUI --> API
-    API --> Acoustic
-    API --> Storage
-    API --> DB
-    DB --> Gallery
-```
+1. [Quickstart & Setup](#-quickstart--setup)
+2. [Task 1: Multi-Source Merge Pipeline](#-task-1-multi-source-merge-pipeline)
+3. [Task 2: No-Code Automation Workflow (n8n)](#-task-2-no-code-automation-workflow-n8n)
+4. [Task 3: Worker Audio Collection App](#-task-3-worker-audio-collection-app)
+5. [Task 4: Data Issues Report (13 Planted Traps)](#-task-4-data-issues-report)
+6. [Task 5: Scaling to 5,000 Workers](#-task-5-scaling-to-5000-workers)
+7. [Stuck Log](#-stuck-log)
+8. [Automated Test Suite](#-automated-test-suite)
 
 ---
 
 ## ⚡ Quickstart & Setup
 
 ### Prerequisites
-- Python 3.10+
+- Python 3.10 or higher
 - `pip` package manager
 
-### 1. Clone & Install Dependencies
+### 1. Clone the repository and install dependencies
 ```bash
 git clone https://github.com/MeowMan007/consultbae.git
 cd consultbae
 
-# Create virtual environment (optional)
+# Create and activate a virtual environment (optional)
 python -m venv venv
-# Windows:
+# On Windows:
 .\venv\Scripts\activate
-# Linux/macOS:
+# On Linux/macOS:
 source venv/bin/activate
 
-# Install requirements
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-### 2. Run the Ingestion & Deduplication Pipeline (Task 1)
+### 2. Run the Data Pipeline (Task 1)
 ```bash
 python -m pipeline.ingest
 ```
-*Outputs a clean SQLite database at `data/database.sqlite3` with audit logs.*
+This reads the 3 CSV files from `data/raw/`, cleans the data, runs the deduplication matcher, and creates a clean SQLite database at `data/database.sqlite3`.
 
 ### 3. Launch the Audio Collection Web App (Task 3)
 ```bash
 uvicorn audio_app.server:app --reload --port 8000
 ```
-Open your browser at **`http://localhost:8000`** to access the live recorder, upload portal, acoustic analytics, and submissions gallery.
+Open your browser at **`http://localhost:8000`** to try the recorder, upload portal, acoustic analytics, and history gallery.
 
-### 4. Run Automated Unit Tests
+### 4. Run the Unit Tests
 ```bash
 pytest tests/ -v
 ```
@@ -143,141 +88,174 @@ pytest tests/ -v
 
 ## 🗄️ Task 1: Multi-Source Merge Pipeline
 
-Ingests 3 disparate, messy CSV files into a unified 3NF relational schema. Because no single common ID exists across all files, the engine utilizes a **deterministic cascading resolution hierarchy**:
-1. **Primary Key Anchor (Phone Number)**: Standardized to 10-digit E.164 string (`9000000xxx`).
-2. **Secondary Key Anchor (Email Address)**: Trimmed and lowercased.
-3. **Disambiguation Safeguard**: Two individuals sharing the same name but possessing different verified phone numbers/emails are strictly kept as distinct candidate records.
-4. **Non-Destructive Attribute Merging**: Merges alias emails, unions skill sets, captures the most complete non-abbreviated name, and updates maximum completed projects.
+The goal of Task 1 was to take 3 separate, messy CSV files from different internal systems and combine them into one clean database without duplicate records.
+
+### The Challenge
+There is no shared primary key across the three systems:
+- **System 1 (Recruitment)** has `Name`, `Phone Number`, `City`, `Verified`, and `Projects Completed`.
+- **System 2 (CBNexus)** has `Full Name`, `Email`, `Phone`, `City`, `Experience (Years)`, `Current CTC`, `Applied Date`, and `Skills`.
+- **System 3 (Internal Ops)** has `email_id`, `worker_name`, `rate`, `location`, `status`, and `skill_tags`.
+
+### How I Solved It:
+1. **Designed a Relational Schema (SQLAlchemy + SQLite)**:
+   - `candidates`: Core identity (UUID, full name, primary phone, primary email, city, is_verified).
+   - `candidate_emails`: Stores secondary/alias emails linked to a candidate so people who applied with multiple emails don't get duplicated.
+   - `candidate_skills`: Normalizes comma-separated skill lists into separate rows for fast filtering.
+   - `work_profiles`: Experience years, projects completed, application status, and applied dates.
+   - `compensations`: Annual CTC in rupees, hourly rates, and monthly rates.
+   - `ingestion_audit_logs`: Keeps an audit trail of every row ingested, what candidate it matched to, and what changes were made.
+
+2. **Matching Strategy (Zero False Positives)**:
+   - **Step 1 — Phone Match**: If a record has a phone number, check if that phone number exists in the database. Phone numbers are the most reliable identifier.
+   - **Step 2 — Email Match**: If no phone match, check if the email exists (in either the primary email field or the alias emails table).
+   - **Step 3 — Name Disambiguation**: I deliberately **do not** merge records based on name alone. Common Indian names (like the two different *Arjun Mehta* records in the dataset) share the same name but have completely different phone numbers and emails. Merging them would corrupt candidate histories.
+
+3. **Non-Destructive Merging**:
+   When an existing candidate is matched:
+   - Abbreviated names like `"R. Verma"` get updated to the full name `"Rohit Verma"`.
+   - New emails are added to the alias table.
+   - Skill sets are combined without duplicates.
+   - The highest project count is kept.
 
 ---
 
 ## 🤖 Task 2: No-Code Automation Workflow (n8n)
 
-The complete exported workflow is located at [`automations/n8n_workflow.json`](automations/n8n_workflow.json).
+The exported workflow file is located at [`automations/n8n_workflow.json`](automations/n8n_workflow.json).
 
-### Workflow Flow:
-1. **Webhook Trigger (`POST /webhook/candidate-submission`)**: Ingests new applicant payloads.
-2. **Database Lookup Node**: Calls backend API `POST /api/candidates/check-duplicate` to check for existing candidate records.
-3. **Condition Switch**:
-   - **Duplicate Branch**: Triggers instant Slack alert detailing duplicate candidate ID and merged history.
-   - **New Candidate Branch**: Passes profile to OpenAI `gpt-4o-mini` LLM node to auto-categorize into `automation-heavy`, `web-dev`, `data`, `ai-ml`, or `qa-automation`, then persists tagged metadata to the database.
+```
+[When clicking 'Test workflow'] ──┐
+                                  ├──► [Format Candidate Payload] ──► [Check DB for Duplicate]
+[Webhook: POST /candidate]      ──┘                                                │
+                                                                                   ▼
+                                                                        [Is Duplicate Candidate?]
+                                                                           ├── True  ──► [Send Duplicate Alert to Slack]
+                                                                           └── False ──► [AI Skill Categorization] ──► [Write Tagged DB] ──► [Send Success Alert]
+```
 
----
-
-## 🎙️ Task 3: Audio Collection Web App & Acoustic Processor
-
-A full-stack, responsive web application allowing gig workers to submit voice recordings and auditors to review acoustic metadata.
-
-### Extracted Acoustic Properties:
-1. **Duration (seconds)**: Exact length calculated from raw frame counts.
-2. **Sample Rate (kHz)**: Sampling frequency (e.g. 44.1 kHz, 48.0 kHz).
-3. **Bitrate (kbps)**: Audio data transmission density.
-4. **Loudness (dBFS)**: Root-Mean-Square (RMS) amplitude relative to full digital scale:
-   $$\text{Loudness (dBFS)} = 20 \log_{10}\left(\frac{\text{RMS}}{\text{Max Possible Amplitude}}\right)$$
-5. **Bonus — SNR Estimate (dB)**: Ratio between 95th percentile speech signal energy and 5th percentile background noise floor.
-6. **Bonus — Quality Score**: Composite classification (`Excellent (Studio/Clean)`, `Good (Acceptable Voice)`, `Fair`, `Poor`).
-
----
-
-## 📊 Task 4: Data Quality & Issues Report
-
-During ETL development, we detected **13 planted data traps** across the 3 raw files. Below is the complete catalog of defects, root causes, and programmatic remedies:
-
-| # | Anomaly Category | Planted Trap Example in Dataset | Remediation Strategy |
-|---|---|---|---|
-| **1** | **Shifted Columns / Malformed CSV Row** | System 3, Row 19: `"react, javascript, mysql", ISHA.CHOPRA95@MAILTEST.EXAMPLE.ORG, Isha Chopra, 1406/hr, Pune, active` (Skills in `email_id` column, email in `worker_name`, etc.) | Developed an anomaly detector in `normalizers.py` that verifies email regex on column 1. If invalid but column 2 matches email pattern, it shifts slice indices back to standard schema before DB insertion. |
-| **2** | **Completely Blank Rows** | System 3, Row 11: `,,,,,` | Filter drops any row where all values are empty or whitespace prior to parsing. |
-| **3** | **Duplicate Header Row Embedded Mid-File** | System 1, Row 15: `Name,Phone Number,City,Verified,Projects Completed` (header row repeated inside data body) | Ingestion detects rows where the `Name` column value literally equals the header text `"Name"` and skips them as duplicate headers. |
-| **4** | **Inconsistent Phone Formats** | `+91-9000000131`, `919000000231`, `09000000287`, `9000000113` | Stripped all non-digit characters, leading `+91`, `91`, and `0` to produce canonical 10-digit Indian numbers (`9000000xxx`). |
-| **5** | **Email Casing & Whitespace** | `ISHA.CHOPRA95@MAILTEST.EXAMPLE.ORG`, `DEEPAK.NAIR44@EXAMPLE.COM` | Normalized via `.strip().lower()` with RFC regex validation. |
-| **6** | **Compensation Units Inconsistency** | System 2 & 3: LPA floats (`4.2`, `8.3`), raw annual INR (`417964`), hourly (`1415/hr`), monthly (`15k/month`) | Parser heuristic: Values $<100$ in CTC are multiplied by 100,000 (Lakhs to INR). `15k/month` is annualized ($15000 \times 12$). Hourly rates stored separately. |
-| **7** | **Common Name Disambiguation** | System 1: `Arjun Mehta` @ `9000000131` vs `Arjun Mehta` @ `9000000272`. System 3: `Deepak Nair` @ `deepak.nair44...` vs `Deepak Nair` @ `deepak.nair57...` | Strict zero-false-positive rule: identical names with different verified phone numbers/emails are never merged. |
-| **8** | **Abbreviated / Nickname Aliases** | System 2: `R. Verma` vs `Rohit Verma` (same phone `9000000294` and email `rohit.verma13@...`) | Merged on verified Phone/Email keys; name canonicalized to the more descriptive, non-abbreviated version (`Rohit Verma`). |
-| **9** | **Alias / Secondary Emails** | System 2: `Nikhil Chopra` (`09000000103`) with `nikhil.chopra70@example.com` and `alt.nikhil.chopra70@example.com` | Merged into single candidate record via phone anchor; secondary email recorded in `candidate_emails` multi-value table. |
-| **10** | **Multi-Format Applied Dates** | `24-07-2026`, `2026-08-08`, `7 Jul 2026`, `07/13/2026`, `08/19/2026` | Multi-pattern datetime parser standardizes all timestamps into ISO 8601 strings (`YYYY-MM-DD`). |
-| **11** | **City Name Synonyms & Whitespace** | `gurugram `, `GURGAON`, `Noida `, `new delhi`, `Delhi NCR`, `bangalore` vs `Bengaluru` | Normalized through canonical dictionary mapping: `{'gurgaon': 'Gurugram', 'bangalore': 'Bengaluru', 'delhi ncr': 'New Delhi', ...}`. |
-| **12** | **Boolean & Status Inconsistencies** | `Y`, `yes`, `Yes`, `No`, `N`, `active`, `ACTIVE`, `paused`, `Inactive` | Standardized `is_verified` to boolean (`True`/`False`) and status to enum (`ACTIVE`, `INACTIVE`, `PAUSED`). |
-| **13** | **Skill String Delimiter & Case Variations** | `"n8n, LangChain, REST APIs"`, `"sql, mongodb, selenium"` | Split by commas, trimmed, converted to canonical title representation, and stored in a junction table. |
+### What the workflow does:
+1. **Trigger**: Accepts incoming submissions either via an HTTP Webhook (`POST /candidate-submission`) or the manual "Test workflow" button.
+2. **Payload Formatting**: Normalizes incoming fields (name, phone, email, skills, experience).
+3. **Duplicate Check (Code Node)**: Checks whether the candidate's phone or email already exists in the database. I wrote this as a self-contained JavaScript code node so it runs reliably on both local n8n instances and n8n Cloud (without getting blocked by cloud SSRF rules).
+4. **Conditional Routing**:
+   - **If Duplicate**: Routes to a notification node that sends an alert with the existing candidate ID.
+   - **If New Candidate**: Passes the profile to an AI skill categorization engine that tags the candidate based on their skill set:
+     - `automation-heavy` (n8n, Zapier, Selenium, Web Scraping, Python)
+     - `web-dev` (React, JavaScript, FastAPI, REST APIs)
+     - `data-engineering` (SQL, MySQL, MongoDB, Pandas)
+     - `ai-ml` (LangChain, LLMs, AI agents)
+   - Saves the tagged candidate and dispatches a success alert.
 
 ---
 
-## 📈 Task 5: Stretch Scalability Architecture (5,000 Workers)
+## 🎙️ Task 3: Worker Audio Collection App
+
+A full-stack web application built with FastAPI and plain JavaScript/CSS, designed for crowdsourced speech collection.
+
+### Key Features:
+- **Dual Submission Modes**: Gig workers can record audio live in the browser using their microphone, or drag and drop an existing audio file (`.wav`, `.mp3`, `.webm`, `.ogg`).
+- **Real-Time Waveform Visualizer**: Uses the browser's Web Audio API (`AnalyserNode`) to draw a live audio waveform on an HTML5 canvas during recording.
+- **Pure-Python Acoustic Feature Extraction** ([`audio_app/audio_processor.py`](audio_app/audio_processor.py)):
+  - **Duration**: Extracted from audio container headers or calculated from WAV frame counts.
+  - **Sample Rate (kHz)**: Sampling frequency (e.g., 44.1 kHz or 48.0 kHz).
+  - **Bitrate (kbps)**: Data rate of the recording.
+  - **Loudness in dBFS**: Calculated using Root-Mean-Square (RMS) amplitude relative to 16-bit digital full scale ($20 \log_{10}(\text{RMS} / 32768)$).
+  - **Signal-to-Noise Ratio (SNR in dB)**: Estimated by dividing the audio into 50ms frames, comparing the 95th percentile frame energy (active speech) against the 5th percentile frame energy (background noise floor).
+  - **Quality Score**: Composite grade (`Excellent (Studio/Clean)`, `Good (Acceptable Voice)`, `Fair`, or `Poor`).
+- **Reviewer History Gallery**: A table displaying all past submissions with inline audio players, extracted acoustic parameters, quality grades, and a search filter.
+
+---
+
+## 📊 Task 4: Data Issues Report
+
+During ETL development, I found **13 planted data traps** across the 3 raw CSV files. Here is what they were and how the code fixes each one:
+
+| # | Data Quality Issue | Where It Occurred | Example in Raw Data | How I Fixed It |
+|---|---|---|---|---|
+| **1** | **Shifted Columns / Corrupted Row** | System 3, Row 19 | `"react, javascript, mysql", ISHA.CHOPRA95@MAILTEST.EXAMPLE.ORG, Isha Chopra, 1406/hr, Pune, active` | Built an anomaly detector in `normalizers.py` that checks if column 0 fails email regex while column 1 matches email regex. When detected, it realigns the dictionary values to the proper columns before saving. |
+| **2** | **Completely Blank Rows** | System 3, Row 11 | `,,,,,` | Filter skips any row where all columns are empty or whitespace before parsing. |
+| **3** | **Duplicate Header Row Embedded Mid-File** | System 1, Row 15 | `Name,Phone Number,City,Verified,Projects Completed` | Ingestion skips rows where the `Name` column value literally equals the string `"Name"`. |
+| **4** | **Inconsistent Phone Formats** | Across System 1 & 2 | `+91-9000000131`, `919000000231`, `09000000287`, `9000000113` | Strips all non-digit characters, removes leading `+91`, `91`, and `0`, and validates that the result is exactly 10 digits (`9000000xxx`). |
+| **5** | **Email Casing & Whitespace** | Across System 2 & 3 | `ISHA.CHOPRA95@MAILTEST.EXAMPLE.ORG`, `DEEPAK.NAIR44@EXAMPLE.COM` | Normalized using `.strip().lower()` with RFC email regex validation. |
+| **6** | **Mixed Compensation Formats (LPA vs Raw INR)** | System 2 & 3 | `4.2`, `8.3` mixed with `417964`, `806661`, `1415/hr`, `15k/month` | Values $<100$ in CTC are treated as LPA and multiplied by 100,000. `15k/month` is annualized ($15000 \times 12$). Hourly rates are stored separately. |
+| **7** | **Same Common Name, Different People** | System 1 & 3 | `Arjun Mehta` (`9000000131`) vs `Arjun Mehta` (`9000000272`) | Zero-false-positive policy: matching requires phone or email confirmation. People with the same name but different contact details are kept separate. |
+| **8** | **Abbreviated Names** | System 2 | `"R. Verma"` vs `"Rohit Verma"` (same phone `9000000294` and email) | Merged using verified phone/email anchors; the name is updated to the more complete version (`Rohit Verma`). |
+| **9** | **Alias / Secondary Emails** | System 2 | `Nikhil Chopra` with `nikhil.chopra70@...` and `alt.nikhil.chopra70@...` | Merged into one candidate record via phone anchor; secondary email is saved in the `candidate_emails` table. |
+| **10** | **Multi-Format Applied Dates** | System 2 | `24-07-2026`, `2026-08-08`, `7 Jul 2026`, `07/13/2026` | Multi-pattern date parser standardizes all dates into ISO 8601 strings (`YYYY-MM-DD`). |
+| **11** | **City Name Synonyms & Spaces** | Across all CSVs | `gurugram `, `GURGAON`, `Noida `, `new delhi`, `Delhi NCR`, `bangalore` vs `Bengaluru` | A dictionary map normalizes city variations to standard names (`Gurugram`, `Bengaluru`, `New Delhi`, `Noida`, `Pune`). |
+| **12** | **Boolean & Status Variations** | System 1 & 3 | `Y`, `yes`, `Yes`, `No`, `N`, `active`, `ACTIVE`, `paused`, `Inactive` | Standardized `is_verified` to boolean (`True`/`False`) and status to canonical values (`ACTIVE`, `INACTIVE`, `PAUSED`). |
+| **13** | **Skill Delimiters & Casing** | System 2 & 3 | `"n8n, LangChain, REST APIs"`, `"sql, mongodb, selenium"` | Split by commas, trimmed, standardized using a canonical skill map, and stored as individual rows. |
+
+---
+
+## 📈 Task 5: Scaling to 5,000 Workers
 
 ### Scenario: Launching the Audio App to 5,000 Gig Workers Over a Weekend
 
-### 1. What Breaks First? (Single-Server Bottlenecks)
-1. **Synchronous Audio Analytics Starvation**: Computing RMS, SNR, and reading full PCM buffers on the main web process locks worker threads, resulting in HTTP 504 Gateway Timeouts under concurrency $>50$ users.
-2. **SQLite Database Write Locks**: SQLite locks the whole DB file on writes (`database is locked` error) when hundreds of workers submit records simultaneously.
-3. **Ephemeral Disk Saturation**: Storing raw audio on local NVMe disk ($5,000 \times 10 \text{ submissions} \times 5\text{MB} = 250\text{ GB}$) fills local volume and causes data loss upon server restart.
-4. **Server Bandwidth Saturation**: Streaming multi-megabyte audio binaries through application reverse proxies exhausts connection sockets.
+### 1. What Breaks First on a Single Server?
+1. **Synchronous Audio Processing Locks the CPU**: Calculating loudness, SNR, and reading raw audio buffers on the main web server thread blocks incoming requests. Under 50+ concurrent uploads, the server runs out of worker threads and returns `504 Gateway Timeout`.
+2. **SQLite Database Write Locks**: SQLite locks the whole database file during write operations. Hundreds of workers submitting recordings simultaneously cause `OperationalError: database is locked` errors.
+3. **Local Disk Runs Out**: 5,000 workers submitting 10 recordings of 5 MB each equals ~250 GB of raw audio. A single server's local disk will fill up, and data would be lost if the instance restarts.
+4. **Server Bandwidth Gets Clogged**: Streaming multi-megabyte audio files through the application server exhausts network connections.
 
-### 2. High-Scale Production Redesign
-```mermaid
-graph TD
-    Client[5,000 Mobile / Web Gig Workers] -->|1. Request Presigned URL| API[FastAPI / Go API Gateway]
-    API -->|2. Generate Signed URL| S3[(AWS S3 / Cloudflare R2 Object Storage)]
-    Client -->|3. Direct Binary Upload| S3
-    S3 -->|4. S3 ObjectCreated Event| SQS[AWS SQS / RabbitMQ Queue]
-    SQS -->|5. Consume Task| Workers[Auto-Scaling Celery / Rust Worker Pool]
-    Workers -->|6. Extract Acoustic Properties| Workers
-    Workers -->|7. Persist Metadata| DB[(Managed PostgreSQL RDS + PgBouncer)]
-    Workers -->|8. Push WebSocket Event| Dashboard[Auditor Dashboard]
-    Redis[(Redis Cluster)] ---|Rate Limiting & Idempotency| API
-```
-
-### 3. Pre-Launch Engineering Enhancements:
-- **Direct S3 / Cloudflare R2 Uploads via Presigned URLs**: Clients upload raw audio directly to cloud object storage via time-limited signed PUT URLs, bypassing backend CPU and network bandwidth entirely.
-- **Asynchronous Processing Queue (Celery + SQS)**: API returns `202 Accepted` immediately upon upload notification. Background worker microservices execute acoustic feature extraction asynchronously.
-- **PostgreSQL with PgBouncer Connection Pooling**: Replaces SQLite with clustered PostgreSQL configured for high-concurrency ACID writes and sub-millisecond index lookups.
-- **Deduplication & Idempotency Guard**: Implements Redis key locking on `hash(phone + audio_sha256)` with a 5-minute TTL to prevent duplicate submissions from double-clicking or flaky mobile connections.
-- **Cost & Bandwidth Optimization**: Background transcode to Opus audio codec at 32 kbps reduces storage and egress costs by ~80% with zero degradation in speech intelligibility.
+### 2. How to Redesign for Production Scale
+- **Direct S3 Uploads via Presigned URLs**: The client asks the API for a temporary signed upload URL, then uploads the audio file directly to AWS S3 (or Cloudflare R2). The audio binary never passes through our application server, saving CPU and bandwidth.
+- **Asynchronous Task Queue (SQS + Celery)**: When an upload completes in S3, an event is placed on an AWS SQS queue. Background Celery workers pick up jobs and calculate acoustic properties (loudness, SNR) asynchronously. The API returns `202 Accepted` immediately to the worker.
+- **PostgreSQL with PgBouncer**: Replace SQLite with managed PostgreSQL (e.g., AWS RDS) using PgBouncer for connection pooling to handle thousands of concurrent read/write queries.
+- **Redis Idempotency Guard**: Store a hash of `phone + audio_sha256` in Redis with a 5-minute expiration to prevent accidental double-submissions from flaky mobile networks.
+- **Transcoding for Storage Savings**: Background workers transcode incoming audio to Opus format at 32 kbps, cutting storage and bandwidth costs by ~80% with zero loss in speech intelligibility.
 
 ---
 
 ## 🛠️ Stuck Log
 
-### 1. Shifted Columns & Misaligned CSV Row in System 3
-- **The Hurdle**: Row 19 of `system3_internal.csv` contained misaligned columns where skills were placed in `email_id` and the email was in `worker_name`. Default `pandas.read_csv()` loaded the skill string into the primary email field, failing foreign key creation.
+### 1. Shifted Columns in System 3 (Row 19)
+- **The Problem**: Row 19 of `system3_internal.csv` had misaligned columns—the skills were placed in the `email_id` column and the email was in `worker_name`. When loaded normally with pandas, the skill string was treated as the email address, breaking downstream lookups.
 - **What I Searched**: `python csv detect shifted columns dynamically`, `pandas handle misaligned row schema`.
 - **What I Asked AI**: *"How can I write a custom CSV parser that detects when an email column contains comma-separated skills and shifts the row back to the correct schema?"*
-- **What AI Suggested & Why I Rejected It**: AI suggested sending all CSV rows to an OpenAI GPT-4 API endpoint to fix them row-by-row. **Why Rejected**: Unviable for production ETL pipelines due to high latency, cost, and non-deterministic behavior.
-- **How I Got Unstuck**: Built a deterministic regex validator in `pipeline/normalizers.py` that validates column 0 against email RFC patterns. If column 0 fails but column 1 succeeds, the parser automatically re-slices the row into proper schema before database ingestion.
+- **What AI Suggested & Why I Rejected It**: AI suggested sending every row to OpenAI's GPT-4 API to "clean and re-align" the data. **Why I rejected it**: Using an LLM API inside an ingestion loop adds high latency, monetary cost, potential API downtime, and non-deterministic behavior. A core data pipeline should be fast and deterministic.
+- **How I Got Unstuck**: I wrote a deterministic rule in `pipeline/normalizers.py`. It checks if column 0 fails email regex while column 1 matches email regex. When that pattern is found, the parser automatically re-slices the row back into the proper schema.
 
 ---
 
-### 2. In-Browser WebM Audio Format & Accurate Loudness (dBFS) Calculation
-- **The Hurdle**: Modern browsers record microphone input as `audio/webm;codecs=opus`. Python's standard `wave` module cannot open WebM containers and threw `wave.Error: file does not start with RIFF id`.
+### 2. Processing Browser-Recorded WebM Audio in Python
+- **The Problem**: When recording in the browser, the MediaRecorder API produces `audio/webm` files. Python's built-in `wave` module cannot parse WebM containers and threw `wave.Error: file does not start with RIFF id`.
 - **What I Searched**: `python extract loudness dbfs from webm without writing to disk`, `mutagen read webm duration sample rate`.
 - **What I Asked AI**: *"How to calculate loudness in dBFS and sample rate from browser-recorded WebM files without requiring system-level ffmpeg binaries?"*
-- **What AI Suggested & Why I Rejected It**: AI suggested executing shell subprocesses calling `ffmpeg` binaries. **Why Rejected**: Subprocesses introduce external system dependencies that break in minimalist containers and cross-platform environments.
-- **How I Got Unstuck**: Designed a hybrid extraction strategy in `audio_processor.py`: using `mutagen` for container metadata (duration, sample rate, bitrate) across WebM/MP3/OGG, paired with a robust byte-variance / PCM energy estimator for accurate decibel loudness and SNR scoring without external binary dependencies.
+- **What AI Suggested & Why I Rejected It**: AI suggested using `subprocess.Popen` to call system `ffmpeg` binaries. **Why I rejected it**: Requiring FFmpeg means anyone running or evaluating the project must install system packages manually, which often fails in minimal Docker containers or different OS environments.
+- **How I Got Unstuck**: I built a pure-Python extraction strategy in `audio_processor.py`. It uses the `mutagen` library to read container metadata (duration, sample rate, bitrate) across WebM, MP3, OGG, and WAV, paired with a byte-variance energy estimator for loudness (dBFS) and SNR calculation without any external binary dependencies.
 
 ---
 
-### 3. Entity Resolution for Common Names with Conflicting Compensation Units
-- **The Hurdle**: Candidates with common names (e.g. two different `Arjun Mehta`s) appeared across files. Simultaneously, System 2 listed `Current CTC` as mixed floats (`4.2`, `8.3`) and raw integers (`417964`, `806661`).
+### 3. Entity Deduplication for Common Names with Conflicting Salary Units
+- **The Problem**: Common names (like two different people named *Arjun Mehta*) appeared in the data with different phone numbers. At the same time, System 2 listed salaries as mixed floats (`4.2`, `8.3`) alongside raw integers (`417964`, `806661`).
 - **What I Searched**: `entity resolution deduplication without common id`, `standardize indian currency lpa vs ctc`.
 - **What I Asked AI**: *"Should I merge records with the same name using Levenshtein distance if phone numbers differ?"*
-- **What AI Suggested & Why I Rejected It**: AI suggested fuzzy matching on candidate names with a 80% similarity threshold and merging them automatically. **Why Rejected**: Catastrophic for common Indian names; merging distinct individuals named "Arjun Mehta" corrupts historical records.
-- **How I Got Unstuck**: Established a strict **Zero-False-Positive Policy**:
-  1. Phone number is the absolute primary anchor (E.164 normalized).
+- **What AI Suggested & Why I Rejected It**: AI suggested fuzzy-matching on candidate names with an 80% similarity threshold and merging them automatically. **Why I rejected it**: For common Indian names, this causes disastrous false merges. Merging two different people named "Arjun Mehta" corrupts their contact details, salaries, and work histories.
+- **How I Got Unstuck**: I adopted a strict **Zero-False-Positive Policy**:
+  1. Phone number is the primary anchor (normalized 10 digits).
   2. Email is the secondary anchor.
-  3. Same names with different phone numbers are strictly kept as distinct entities.
-  4. Built a currency parser where values $< 100$ are recognized as LPA ($\times 100,000$) and larger integers as raw INR.
+  3. Records sharing the same name but having different phone numbers/emails are strictly kept separate.
+  4. For salary, I used a threshold heuristic: values $<100$ are recognized as LPA ($\times 100,000$) and larger values as raw annual INR.
 
 ---
 
-## 🧪 Test Suite & Verification
+## 🧪 Automated Test Suite
 
-Run the comprehensive unit test suite:
+Run the full pytest suite with:
 ```bash
 pytest tests/ -v
 ```
 
-### Test Coverage Summary:
-- `test_phone_normalization`: Verifies stripping of `+91`, `0`, and hyphens into standard 10-digit format.
-- `test_email_normalization`: Verifies trimming, lowercasing, and regex matching.
-- `test_compensation_normalization`: Verifies LPA float, raw INR, hourly rate, and monthly rate parsing.
-- `test_shifted_row_cleaner`: Validates recovery and re-alignment of corrupted System 3 row 19.
-- `test_entity_deduplication`: Verifies cross-file entity matching and attribute merging into a single candidate record.
-- `test_audio_feature_extraction`: Validates duration, sample rate, bitrate, loudness (dBFS), and SNR calculation on synthetic PCM audio.
+### Test Coverage:
+- `test_phone_normalization`: Strips `+91`, `0`, and punctuation into standard 10-digit Indian numbers.
+- `test_email_normalization`: Trims whitespace, lowercases, and validates RFC email format.
+- `test_compensation_normalization`: Handles LPA floats, raw INR integers, hourly rates, and monthly rates.
+- `test_shifted_row_cleaner`: Verifies detection and column realignment for corrupted System 3 row 19.
+- `test_entity_deduplication`: Validates cross-file matching and non-destructive merging on an in-memory SQLite database.
+- `test_audio_feature_extraction`: Generates a synthetic sine wave tone in RAM and validates duration, sample rate, bitrate, loudness (dBFS), and SNR calculation.
+- `test_api_stats`, `test_duplicate_check_api`, `test_audio_submission_api`: Tests the FastAPI backend endpoints using `TestClient`.
+
+---
+
+*Thank you for reviewing my project!*
