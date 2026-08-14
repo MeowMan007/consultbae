@@ -3,213 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ConsultBae — Audio Collection & Automation Portal</title>
+    <title>ConsultBae — Audio Collection & Acoustic Analytics</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="glow-bg glow-1"></div>
-    <div class="glow-bg glow-2"></div>
-
-    <div class="app-container">
-        <!-- Header -->
-        <header class="main-header">
-            <div class="brand">
-                <div class="logo-icon">🎙️</div>
-                <div class="brand-text">
-                    <h1>ConsultBae Audio Studio</h1>
-                    <p>AI Worker Voice Collection & Acoustic Feature Extraction</p>
+    <div class="site-wrapper">
+        <!-- Minimalist Navbar -->
+        <nav class="top-nav">
+            <div class="nav-left">
+                <a href="#" class="brand-logo">ConsultBae</a>
+                <span class="brand-sub">Audio Studio</span>
+            </div>
+            <div class="nav-right">
+                <button class="nav-link active" id="btn-tab-submit">Collector</button>
+                <button class="nav-link" id="btn-tab-gallery">History & Review</button>
+                <a href="/docs" target="_blank" class="nav-link">API Docs</a>
+                <div class="nav-stat-pill">
+                    <span class="stat-num" id="stat-candidates">--</span>
+                    <span class="stat-txt">Candidates</span>
                 </div>
             </div>
-            <div class="stats-badge-container">
-                <div class="stat-pill">
-                    <span class="pill-dot live"></span>
-                    <span class="pill-label">Unified Candidates:</span>
-                    <span class="pill-val" id="stat-candidates">--</span>
-                </div>
-                <div class="stat-pill">
-                    <span class="pill-dot blue"></span>
-                    <span class="pill-label">Audio Submissions:</span>
-                    <span class="pill-val" id="stat-audios">--</span>
-                </div>
-            </div>
-        </header>
+        </nav>
 
-        <!-- Navigation Tabs -->
-        <div class="tabs-nav">
-            <button class="tab-btn active" data-tab="tab-submit" id="btn-tab-submit">
-                <span class="tab-icon">⏺️</span> Worker Audio Submission
-            </button>
-            <button class="tab-btn" data-tab="tab-gallery" id="btn-tab-gallery">
-                <span class="tab-icon">📊</span> Submissions Gallery & Audio Player
-            </button>
-        </div>
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- VIEW 1: SUBMISSION / RECORDER -->
+            <section class="view-panel active" id="tab-submit">
+                <!-- Hero Header -->
+                <div class="hero-section">
+                    <h1 class="hero-title">Collect and verify audio recordings from gig workers.</h1>
+                    <p class="hero-desc">
+                        Submit or record voice samples to automatically extract acoustic parameters—duration, sample rate, bitrate, loudness, and background noise quality metrics in real-time.
+                    </p>
+                </div>
 
-        <!-- TAB 1: SUBMISSION PORTAL -->
-        <section class="tab-content active" id="tab-submit">
-            <div class="grid-2-col">
-                <!-- Left: Form & Recorder -->
-                <div class="glass-card">
-                    <h2 class="card-title">📝 Worker Information</h2>
+                <!-- Input & Action Container -->
+                <div class="interactive-container">
                     <form id="audio-form" onsubmit="event.preventDefault();">
-                        <div class="form-group">
-                            <label for="worker-name">Full Name <span class="req">*</span></label>
-                            <input type="text" id="worker-name" placeholder="e.g. Arjun Mehta" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="worker-phone">Phone Number (10 Digits) <span class="req">*</span></label>
-                            <input type="tel" id="worker-phone" placeholder="e.g. +91 9000000131 or 9000000131" required>
-                        </div>
-
-                        <!-- Audio Source Toggle -->
-                        <div class="source-toggle-group">
-                            <button type="button" class="source-toggle active" id="toggle-record">
-                                🎙️ Live Microphone
-                            </button>
-                            <button type="button" class="source-toggle" id="toggle-upload">
-                                📁 Upload Audio File
-                            </button>
+                        <!-- Top Inputs Row -->
+                        <div class="input-grid">
+                            <div class="field-group">
+                                <label for="worker-name">Worker Name</label>
+                                <input type="text" id="worker-name" placeholder="e.g. Arjun Mehta" class="dark-input" required>
+                            </div>
+                            <div class="field-group">
+                                <label for="worker-phone">Phone Number (10 Digits)</label>
+                                <input type="tel" id="worker-phone" placeholder="e.g. +91 9000000131 or 9000000131" class="dark-input" required>
+                            </div>
                         </div>
 
-                        <!-- Live Recorder Box -->
-                        <div class="recorder-section" id="recorder-box">
-                            <div class="visualizer-container">
+                        <!-- Source Switcher -->
+                        <div class="mode-switch">
+                            <button type="button" class="mode-btn active" id="toggle-record">Record In-Browser</button>
+                            <button type="button" class="mode-btn" id="toggle-upload">Upload File</button>
+                        </div>
+
+                        <!-- In-Browser Recorder Panel -->
+                        <div class="recorder-panel" id="recorder-box">
+                            <div class="canvas-wrap">
                                 <canvas id="waveform-canvas"></canvas>
-                                <div class="rec-timer" id="rec-timer">00:00</div>
+                                <span class="timer-badge" id="rec-timer">00:00</span>
                             </div>
-                            <div class="recorder-controls">
-                                <button type="button" class="btn btn-record" id="btn-start-record">
-                                    <span class="rec-dot"></span> Start Recording
+                            <div class="rec-actions">
+                                <button type="button" class="btn-rec-action" id="btn-start-record">
+                                    <span class="dot-record"></span> Start Recording
                                 </button>
-                                <button type="button" class="btn btn-stop" id="btn-stop-record" disabled>
-                                    ⏹️ Stop
+                                <button type="button" class="btn-rec-action btn-secondary" id="btn-stop-record" disabled>
+                                    Stop
                                 </button>
                             </div>
                         </div>
 
-                        <!-- File Upload Box -->
-                        <div class="upload-section hidden" id="upload-box">
+                        <!-- File Upload Panel -->
+                        <div class="upload-panel hidden" id="upload-box">
                             <div class="drop-zone" id="drop-zone">
-                                <div class="drop-icon">📤</div>
-                                <p class="drop-text">Drag & drop audio file here or <span class="browse-link">Browse</span></p>
-                                <span class="drop-sub">Supported formats: WAV, MP3, WebM, OGG, M4A</span>
+                                <div class="drop-icon">↑</div>
+                                <p class="drop-main-text">Drag and drop audio file here, or <span class="highlight-text">browse</span></p>
+                                <span class="drop-hint-text">Supported: WAV, MP3, WebM, OGG, M4A</span>
                                 <input type="file" id="file-input" accept="audio/*" class="file-hidden">
                             </div>
                         </div>
 
-                        <!-- Preview Player -->
-                        <div class="preview-container hidden" id="preview-box">
-                            <div class="preview-header">
-                                <span>🎵 Audio Preview Ready</span>
-                                <button type="button" class="btn-clear" id="btn-clear-audio">✕ Clear</button>
+                        <!-- Audio Preview Box -->
+                        <div class="preview-box hidden" id="preview-box">
+                            <div class="preview-meta">
+                                <span class="preview-title">Ready for Analysis</span>
+                                <button type="button" class="btn-text-clear" id="btn-clear-audio">Remove</button>
                             </div>
-                            <audio id="preview-player" controls class="audio-player-custom"></audio>
+                            <audio id="preview-player" controls class="custom-audio"></audio>
                         </div>
 
-                        <button type="button" class="btn btn-primary submit-btn" id="btn-submit" disabled>
-                            🚀 Submit Audio Recording
-                        </button>
+                        <!-- Action Submit Button -->
+                        <div class="submit-action-row">
+                            <button type="button" class="btn-submit-main" id="btn-submit" disabled>
+                                Submit & Extract Properties
+                            </button>
+                            <span class="sub-disclaimer">Acoustic extraction and SQLite database persistence occur automatically.</span>
+                        </div>
                     </form>
                 </div>
 
-                <!-- Right: Live Acoustic Analysis Result Card -->
-                <div class="glass-card" id="result-card">
-                    <h2 class="card-title">⚡ Acoustic Feature Extraction</h2>
-                    <p class="card-subtitle">Real-time signal analysis computed automatically upon submission:</p>
-
-                    <div class="metrics-grid">
-                        <div class="metric-card">
-                            <div class="metric-icon">⏱️</div>
-                            <div class="metric-info">
-                                <span class="metric-label">Duration</span>
-                                <span class="metric-value" id="res-duration">-- s</span>
-                            </div>
+                <!-- Bento Grid / Metrics Display -->
+                <div class="bento-container" id="bento-metrics">
+                    <div class="bento-grid">
+                        <div class="bento-card">
+                            <span class="bento-label">Duration</span>
+                            <div class="bento-value" id="res-duration">—</div>
+                            <span class="bento-sub">Exact length in seconds</span>
                         </div>
-                        <div class="metric-card">
-                            <div class="metric-icon">📻</div>
-                            <div class="metric-info">
-                                <span class="metric-label">Sample Rate</span>
-                                <span class="metric-value" id="res-samplerate">-- kHz</span>
-                            </div>
+                        <div class="bento-card">
+                            <span class="bento-label">Sample Rate</span>
+                            <div class="bento-value" id="res-samplerate">—</div>
+                            <span class="bento-sub">Sampling frequency in kHz</span>
                         </div>
-                        <div class="metric-card">
-                            <div class="metric-icon">📈</div>
-                            <div class="metric-info">
-                                <span class="metric-label">Bitrate</span>
-                                <span class="metric-value" id="res-bitrate">-- kbps</span>
-                            </div>
+                        <div class="bento-card">
+                            <span class="bento-label">Bitrate</span>
+                            <div class="bento-value" id="res-bitrate">—</div>
+                            <span class="bento-sub">Density in kbps</span>
                         </div>
-                        <div class="metric-card">
-                            <div class="metric-icon">🔊</div>
-                            <div class="metric-info">
-                                <span class="metric-label">Loudness (dBFS)</span>
-                                <span class="metric-value" id="res-loudness">-- dBFS</span>
-                            </div>
+                        <div class="bento-card">
+                            <span class="bento-label">Loudness</span>
+                            <div class="bento-value" id="res-loudness">—</div>
+                            <span class="bento-sub">RMS relative to full scale (dBFS)</span>
                         </div>
-                        <div class="metric-card">
-                            <div class="metric-icon">🛡️</div>
-                            <div class="metric-info">
-                                <span class="metric-label">SNR (Noise Floor)</span>
-                                <span class="metric-value" id="res-snr">-- dB</span>
-                            </div>
+                        <div class="bento-card">
+                            <span class="bento-label">Noise Floor (SNR)</span>
+                            <div class="bento-value" id="res-snr">—</div>
+                            <span class="bento-sub">Signal-to-noise ratio in dB</span>
                         </div>
-                        <div class="metric-card">
-                            <div class="metric-icon">⭐</div>
-                            <div class="metric-info">
-                                <span class="metric-label">Quality Score</span>
-                                <span class="metric-value grade" id="res-quality">--</span>
-                            </div>
+                        <div class="bento-card">
+                            <span class="bento-label">Quality Grade</span>
+                            <div class="bento-value" id="res-quality">—</div>
+                            <span class="bento-sub">Acoustic quality assessment</span>
                         </div>
                     </div>
-
-                    <div class="status-banner info" id="status-banner">
-                        Ready for candidate submission. Record or upload an audio file to extract acoustic properties.
+                    <div class="status-indicator" id="status-banner">
+                        Awaiting submission. Enter worker details and record or upload audio.
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- TAB 2: AUDITOR GALLERY -->
-        <section class="tab-content" id="tab-gallery">
-            <div class="glass-card">
-                <div class="gallery-header">
-                    <div>
-                        <h2 class="card-title">🎧 Audio Submissions & Quality Review Gallery</h2>
-                        <p class="card-subtitle">All worker recordings stored in SQLite database with extracted properties</p>
-                    </div>
-                    <div class="gallery-actions">
-                        <input type="text" id="search-submissions" placeholder="🔍 Search name or phone..." class="search-input">
-                        <button class="btn btn-secondary" id="btn-refresh-gallery">🔄 Refresh</button>
-                    </div>
+            <!-- VIEW 2: SUBMISSIONS GALLERY -->
+            <section class="view-panel" id="tab-gallery">
+                <div class="hero-section">
+                    <h1 class="hero-title">Submission History & Review</h1>
+                    <p class="hero-desc">Complete ledger of recorded audio assets, extracted signal properties, and quality scores.</p>
                 </div>
 
-                <div class="table-responsive">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Worker Name</th>
-                                <th>Phone</th>
-                                <th>Audio Player</th>
-                                <th>Duration</th>
-                                <th>Sample Rate</th>
-                                <th>Bitrate</th>
-                                <th>Loudness (dBFS)</th>
-                                <th>SNR</th>
-                                <th>Quality</th>
-                                <th>Submitted At</th>
-                            </tr>
-                        </thead>
-                        <tbody id="submissions-tbody">
-                            <tr>
-                                <td colspan="10" class="text-center">Loading recordings...</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="table-container">
+                    <div class="table-controls">
+                        <input type="text" id="search-submissions" placeholder="Filter by name or phone number..." class="search-input">
+                        <button class="btn-rec-action btn-secondary" id="btn-refresh-gallery">Refresh</button>
+                    </div>
+
+                    <div class="table-scroll">
+                        <table class="minimal-table">
+                            <thead>
+                                <tr>
+                                    <th>Worker</th>
+                                    <th>Phone</th>
+                                    <th>Audio Playback</th>
+                                    <th>Duration</th>
+                                    <th>Sample Rate</th>
+                                    <th>Bitrate</th>
+                                    <th>Loudness</th>
+                                    <th>SNR</th>
+                                    <th>Quality</th>
+                                    <th>Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody id="submissions-tbody">
+                                <tr>
+                                    <td colspan="10" class="text-center">Loading submissions...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </main>
     </div>
 
     <script src="app.js"></script>

@@ -1,4 +1,4 @@
-// ConsultBae Audio Collection App Logic
+// ConsultBae Audio Studio - Minimal Monochrome Theme Logic
 
 document.addEventListener("DOMContentLoaded", () => {
     // State variables
@@ -41,7 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const workerPhone = document.getElementById("worker-phone");
 
     const statCandidates = document.getElementById("stat-candidates");
-    const statAudios = document.getElementById("stat-audios");
 
     const resDuration = document.getElementById("res-duration");
     const resSamplerate = document.getElementById("res-samplerate");
@@ -57,7 +56,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let allSubmissions = [];
 
-    // Initialize System Stats & Gallery
+    // Set canvas dimensions
+    function resizeCanvas() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+    }
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    // Initial stats and gallery load
     fetchStats();
     fetchSubmissions();
 
@@ -87,6 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
         toggleUpload.classList.remove("active");
         recorderBox.classList.remove("hidden");
         uploadBox.classList.add("hidden");
+        resizeCanvas();
     });
 
     toggleUpload.addEventListener("click", () => {
@@ -97,7 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // -------------------------------------------------------------
-    // Audio Visualizer Drawing
+    // Waveform Visualizer (Monochrome Clean Line)
     // -------------------------------------------------------------
     function drawVisualizer() {
         if (!analyser) return;
@@ -108,11 +116,11 @@ document.addEventListener("DOMContentLoaded", () => {
             animationId = requestAnimationFrame(renderFrame);
             analyser.getByteTimeDomainData(dataArray);
 
-            canvasCtx.fillStyle = "#060911";
+            canvasCtx.fillStyle = "#000000";
             canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-            canvasCtx.lineWidth = 2;
-            canvasCtx.strokeStyle = "#06b6d4";
+            canvasCtx.lineWidth = 1.5;
+            canvasCtx.strokeStyle = "#ffffff";
             canvasCtx.beginPath();
 
             const sliceWidth = (canvas.width * 1.0) / bufferLength;
@@ -169,7 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
             btnStopRecord.disabled = false;
             drawVisualizer();
         } catch (err) {
-            alert("Microphone access denied or not supported: " + err.message);
+            alert("Microphone access denied: " + err.message);
         }
     });
 
@@ -248,7 +256,6 @@ document.addEventListener("DOMContentLoaded", () => {
         checkFormValidity();
     });
 
-    // Form inputs validation listener
     workerName.addEventListener("input", checkFormValidity);
     workerPhone.addEventListener("input", checkFormValidity);
 
@@ -266,9 +273,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!selectedFile) return;
 
         btnSubmit.disabled = true;
-        btnSubmit.textContent = "⏳ Extracting Features & Submitting...";
-        statusBanner.className = "status-banner info";
-        statusBanner.textContent = "Uploading audio, running acoustic analysis, and updating database...";
+        btnSubmit.textContent = "Processing & Extracting...";
+        statusBanner.className = "status-indicator";
+        statusBanner.textContent = "Extracting acoustic parameters and persisting candidate record...";
 
         const formData = new FormData();
         formData.append("name", workerName.value.trim());
@@ -284,45 +291,42 @@ document.addEventListener("DOMContentLoaded", () => {
             const result = await resp.json();
 
             if (!resp.ok) {
-                throw new Error(result.detail || "Upload failed");
+                throw new Error(result.detail || "Submission failed");
             }
 
-            // Display extracted features
             const sub = result.submission;
-            resDuration.textContent = `${sub.duration_seconds} s`;
+            resDuration.textContent = `${sub.duration_seconds}s`;
             resSamplerate.textContent = `${sub.sample_rate_khz} kHz`;
             resBitrate.textContent = `${sub.bitrate_kbps} kbps`;
             resLoudness.textContent = `${sub.loudness_dbfs} dBFS`;
-            resSnr.textContent = `${sub.snr_db ?? "--"} dB`;
+            resSnr.textContent = `${sub.snr_db ?? "—"} dB`;
             resQuality.textContent = sub.quality_grade;
 
-            statusBanner.className = "status-banner success";
-            statusBanner.textContent = `✅ Successfully submitted! Audio features extracted and saved for Candidate: ${sub.candidate_name}.`;
+            statusBanner.className = "status-indicator success";
+            statusBanner.textContent = `Submission verified: Record stored for ${sub.candidate_name} (${sub.candidate_phone}).`;
 
-            // Reset form
             workerName.value = "";
             workerPhone.value = "";
             btnClearAudio.click();
             fetchStats();
             fetchSubmissions();
         } catch (err) {
-            statusBanner.className = "status-banner error";
-            statusBanner.textContent = `❌ Submission Error: ${err.message}`;
+            statusBanner.className = "status-indicator error";
+            statusBanner.textContent = `Error: ${err.message}`;
         } finally {
-            btnSubmit.textContent = "🚀 Submit Audio Recording";
+            btnSubmit.textContent = "Submit & Extract Properties";
             checkFormValidity();
         }
     });
 
     // -------------------------------------------------------------
-    // System Stats & Gallery Flow
+    // Stats & History Flow
     // -------------------------------------------------------------
     async function fetchStats() {
         try {
             const resp = await fetch("/api/stats");
             const data = await resp.json();
             statCandidates.textContent = data.total_candidates ?? "--";
-            statAudios.textContent = data.total_audio_submissions ?? "--";
         } catch (e) {
             console.error("Stats error:", e);
         }
@@ -334,7 +338,7 @@ document.addEventListener("DOMContentLoaded", () => {
             allSubmissions = await resp.json();
             renderGallery(allSubmissions);
         } catch (e) {
-            submissionsTbody.innerHTML = `<tr><td colspan="10" class="text-center text-muted">Failed to load submissions.</td></tr>`;
+            submissionsTbody.innerHTML = `<tr><td colspan="10" class="text-center">Error loading history.</td></tr>`;
         }
     }
 
@@ -352,7 +356,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function renderGallery(submissions) {
         if (!submissions || submissions.length === 0) {
-            submissionsTbody.innerHTML = `<tr><td colspan="10" class="text-center text-muted">No audio submissions found. Be the first to record!</td></tr>`;
+            submissionsTbody.innerHTML = `<tr><td colspan="10" class="text-center" style="color: var(--text-muted);">No submissions recorded yet.</td></tr>`;
             return;
         }
 
@@ -361,20 +365,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 (s) => `
             <tr>
                 <td><strong>${escapeHtml(s.candidate_name)}</strong></td>
-                <td><code>${escapeHtml(s.candidate_phone)}</code></td>
+                <td><span class="code-badge">${escapeHtml(s.candidate_phone)}</span></td>
                 <td>
-                    <audio controls preload="none" style="height: 32px; width: 180px;">
+                    <audio controls preload="none" class="custom-audio" style="height: 30px; width: 170px;">
                         <source src="/api/audio/file/${encodeURIComponent(s.file_name)}" type="audio/wav">
-                        Your browser does not support audio playback.
                     </audio>
                 </td>
-                <td><span class="badge badge-blue">${s.duration_seconds}s</span></td>
-                <td><span class="badge">${s.sample_rate_khz} kHz</span></td>
-                <td><span class="badge">${s.bitrate_kbps} kbps</span></td>
-                <td><span class="badge ${s.loudness_dbfs < -40 ? "badge-yellow" : "badge-green"}">${s.loudness_dbfs} dBFS</span></td>
-                <td><span class="badge">${s.snr_db ?? "N/A"} dB</span></td>
-                <td><span class="badge badge-green">${escapeHtml(s.quality_grade)}</span></td>
-                <td style="color: var(--text-muted); font-size: 11px;">${s.created_at || "Just now"}</td>
+                <td>${s.duration_seconds}s</td>
+                <td>${s.sample_rate_khz} kHz</td>
+                <td>${s.bitrate_kbps} kbps</td>
+                <td>${s.loudness_dbfs} dBFS</td>
+                <td>${s.snr_db ?? "—"} dB</td>
+                <td>${escapeHtml(s.quality_grade)}</td>
+                <td style="color: var(--text-muted); font-size: 11px;">${s.created_at || "Recent"}</td>
             </tr>
         `
             )
