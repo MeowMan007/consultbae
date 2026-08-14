@@ -4,16 +4,30 @@ A production-grade, end-to-end multi-source data ingestion pipeline, no-code aut
 
 ---
 
+## 📹 Video Walkthrough
+
+> **Loom Video Link**: `[Insert your Loom video link here]`
+
+### Walkthrough Outline
+- **System Overview & Architecture**: Walkthrough of SQLite relational database design and pipeline structure.
+- **Task 1 (Ingestion & Merge)**: Live terminal run of `python -m pipeline.ingest` (103 raw rows ingested into 60 clean candidates, catching 13 planted data traps).
+- **Task 2 (n8n Automation)**: Workflow walkthrough showing Webhook trigger, duplicate verification against DB, and AI skill categorization (`automation-heavy`, `web-dev`, `data-engineering`, `ai-ml`).
+- **Task 3 (Worker Audio Collection)**: Live in-browser microphone recording at `http://localhost:8000`, waveform visualizer, automatic acoustic feature extraction (duration, sample rate, bitrate, loudness in dBFS, SNR, quality grade), and reviewer history playback.
+- **Task 5 (Scalability Design) & Stuck Log**: Review of 5,000-worker cloud architecture (S3 presigned URLs, SQS, Celery, PostgreSQL) and key problem-solving decisions from the stuck log.
+
+---
+
 ## 📑 Table of Contents
-1. [Architecture Overview](#-architecture-overview)
-2. [Quickstart & Setup](#-quickstart--setup)
-3. [Task 1: Multi-Source Merge Pipeline](#-task-1-multi-source-merge-pipeline)
-4. [Task 2: No-Code Automation Workflow (n8n)](#-task-2-no-code-automation-workflow-n8n)
-5. [Task 3: Audio Collection Web App & Acoustic Processor](#-task-3-audio-collection-web-app--acoustic-processor)
-6. [Task 4: Data Quality & Issues Report (Planted Traps)](#-task-4-data-quality--issues-report)
-7. [Task 5: Stretch Scalability Architecture (5,000 Workers)](#-task-5-stretch-scalability-architecture-5000-workers)
-8. [Stuck Log (Engineering Hurdles & AI Evaluation)](#-stuck-log)
-9. [Test Suite & Verification](#-test-suite--verification)
+1. [Video Walkthrough](#-video-walkthrough)
+2. [Architecture Overview](#-architecture-overview)
+3. [Quickstart & Setup](#-quickstart--setup)
+4. [Task 1: Multi-Source Merge Pipeline](#-task-1-multi-source-merge-pipeline)
+5. [Task 2: No-Code Automation Workflow (n8n)](#-task-2-no-code-automation-workflow-n8n)
+6. [Task 3: Audio Collection Web App & Acoustic Processor](#-task-3-audio-collection-web-app--acoustic-processor)
+7. [Task 4: Data Quality & Issues Report (Planted Traps)](#-task-4-data-quality--issues-report)
+8. [Task 5: Stretch Scalability Architecture (5,000 Workers)](#-task-5-stretch-scalability-architecture-5000-workers)
+9. [Stuck Log (Engineering Hurdles & AI Evaluation)](#-stuck-log)
+10. [Test Suite & Verification](#-test-suite--verification)
 
 ---
 
@@ -251,12 +265,3 @@ pytest tests/ -v
 - `test_shifted_row_cleaner`: Validates recovery and re-alignment of corrupted System 3 row 19.
 - `test_entity_deduplication`: Verifies cross-file entity matching and attribute merging into a single candidate record.
 - `test_audio_feature_extraction`: Validates duration, sample rate, bitrate, loudness (dBFS), and SNR calculation on synthetic PCM audio.
-
----
-
-## 📹 Video Walkthrough Outline (6-Minute Guide)
-- **0:00 - 0:45**: Architecture overview & SQLite relational schema.
-- **0:45 - 2:00**: Ingestion pipeline execution (`python -m pipeline.ingest`) & 12 planted traps review.
-- **2:00 - 3:00**: n8n automation walkthrough (`POST /webhook/candidate-submission` $\rightarrow$ DB check $\rightarrow$ LLM tagging).
-- **3:00 - 4:30**: Live Audio Studio demo (microphone recording, file upload, instant acoustic property calculation, and gallery playback).
-- **4:30 - 5:30**: 5,000-worker scale design breakdown & Stuck Log highlights.
