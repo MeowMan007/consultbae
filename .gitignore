@@ -1,0 +1,27 @@
+# Ignore Prompt documents
+prompt.md
+PROMPT.md
+*_prompt.md
+*.prompt.md
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+*.env
+
+# Database & Uploads
+*.db
+*.sqlite3
+uploads/
+audio_storage/
+audio_app/storage/
+
+# System / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
